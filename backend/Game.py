@@ -2,10 +2,16 @@
 # from Card.py import Card
 # from Board.py import Board
 # from Enums.py import Hallways
-from character import Character
-from card import Card
-from board import Board
-from enums import Hallways
+#from character import Character
+#from card import Card
+#from board import Board
+#from enums import Hallways
+
+from Character import * 
+from Card import *
+from Board import * 
+from Enums import *
+
 #from Enums.py import Suspects, CharacterStarts, Weapons, Rooms
 import random
 
@@ -37,39 +43,45 @@ class Game:
         room_range = range(13, 22)
         ranges = [suspect_range, weapon_range, room_range]
         weights = [1, 1, 2]
-        
-        for category in ["Suspect", "Weapon", "Room"]:
-            chosen_range = random.choices(ranges, weights=weights)[0]
+        dummyCard = Card()
+
+        #couldn't we just loop over the ranges? i think the weights are a little unnecessary
+        #for category in ["Suspect", "Weapon", "Room"]:
+        for chosen_range in ranges:
+            #chosen_range = random.choices(ranges, weights=weights)[0] 
+            #This doesn't behave in the way we think it does. Weights didn't guarantee that the [0th] choice would be a type of card that we didn't have already
             card_number = random.choice(chosen_range)
-            card_info = Card().get_card_by_number(card_number)
+            card_info = dummyCard.get_card_by_number(card_number)
             if card_info:
                 card_type, name = card_info
-                self.solutions[card_type] = name
+                self.solution[card_type] = name
                 solutionCardNumbers.append(card_number) 
-
+        
         # set name and location of all characters on board
         for i in range(len(ALL_CHARACTERS)): 
             character = Character(ALL_CHARACTERS[i], ALL_CHARACTER_STARTS[i])
             self.characters.append(character)
 
         # set up remaining card
-        allCards = [range(1,22)]
-        randomizedCardsLeft = random.shuffle([card for card in allCards if card not in solutionCardNumbers])
-        numHands = len(self.playerIds)
-        numCardsPerHand = cardsLeft // numHands
+        allCards = list(range(1,22)) 
+        randomizedCardsLeft = [card for card in allCards if card not in solutionCardNumbers]
+        random.shuffle(randomizedCardsLeft)
+        numHands = len(self.playerIds) #what happens if divide by 0?
+        numCardsPerHand = len(randomizedCardsLeft) // numHands
         
-        leftover = cardsLeft % numHands
+        leftover = len(randomizedCardsLeft) % numHands
         cardsDealt = 0
 
         # assign which player gets what character and give them a hand
         playersAssigned = 0
-        for random_character in random.shuffle(self.characters):
+        random.shuffle(self.characters)
+        for random_character in self.characters:
             # exit if all players have been assigned a character
             if playersAssigned == len(self.playerIds):
                 break 
             
             random_character.isPlayer = True
-            playerToCharacter[playerId[playersAssigned]] = character
+            self.playerToCharacter[self.playerIds[playersAssigned]] = random_character #character?
             playersAssigned += 1
 
             # deal cards
@@ -81,7 +93,7 @@ class Game:
             cards = randomizedCardsLeft[cardsDealt:cardsDealt+numCardsToDeal]
             cardsDealt += numCardsToDeal
             random_character.setHand(cards)
-
+    
     def getCharacter(self, character_name):
         for c in self.characters:
             if c.name == character_name:

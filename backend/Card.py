@@ -21,14 +21,14 @@ class Card:
       19: ("Rooms", "Kitchen"),
       20: ("Rooms", "Ballroom"),
       21: ("Rooms", "Study"),
-}
+    }
 
-def get_card_by_number(self, number):
-    if number not in self.CARD_NUMBERS:
-      return None
+    def get_card_by_number(self, number):
+        if number not in self.CARD_NUMBERS:
+          return None
 
-    card_type, name = self.CARD_NUMBERS[number]
-    return card_type, name
+        card_type, name = self.CARD_NUMBERS[number]
+        return card_type, name
 
 #card_info = card.get_card_by_number(8)
 #if card_info:

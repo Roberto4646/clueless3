@@ -1,5 +1,7 @@
-from enums import Rooms, Hallways
-from character import Character
+#from enums import Rooms, Hallways
+#from character import Character
+from Enums import *
+from Character import *
 
 class Board:
 

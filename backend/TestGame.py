@@ -1,8 +1,8 @@
 import unittest
 # from ..Game.py import Game
  # attempted relative import with no known parent package
-from game import Game
-
+#from game import Game
+from Game import * 
 
 class TestGame(unittest.TestCase):
 
@@ -28,7 +28,13 @@ class TestGame(unittest.TestCase):
         assert playerId1 in game.playerIds
         assert playerId2 in game.playerIds
 
-    # def test_setupGame(self):
+    def test_setupGame(self):
+        game = Game()
+        playerId1 = "player1"
+        playerId2 = "player2"
+        game.addPlayer(playerId1)
+        game.addPlayer(playerId2)
+        game.setupGame()
         
 
 
