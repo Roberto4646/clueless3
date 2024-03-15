@@ -1,7 +1,12 @@
-from Character.py import Character
-from Card.py import Card
-from Board.py import Board
-from Enums.py import Suspects, CharacterStarts, Weapons, Rooms, Hallways
+# from Character.py import Character
+# from Card.py import Card
+# from Board.py import Board
+# from Enums.py import Hallways
+from character import Character
+from card import Card
+from board import Board
+from enums import Hallways
+#from Enums.py import Suspects, CharacterStarts, Weapons, Rooms
 import random
 
 ALL_CHARACTERS = ["Miss Scarlet", "Professor Plum", "Mr. Green", "Mrs. White", "Mrs. Peacock"]
@@ -49,9 +54,10 @@ class Game:
 
         # set up remaining card
         allCards = [range(1,22)]
-        randomizedCardsLeft = random.shuffle([card in card in allCards if item not in solutionCardNumbers])
+        randomizedCardsLeft = random.shuffle([card for card in allCards if card not in solutionCardNumbers])
         numHands = len(self.playerIds)
         numCardsPerHand = cardsLeft // numHands
+        
         leftover = cardsLeft % numHands
         cardsDealt = 0
 
@@ -100,8 +106,39 @@ class Game:
 
         return canMove, canSuggest, canAccuse
 
-    def processMove(self, choice, character):
-        self.board.fa
+    def processMove(self, character):
+        choices = self.board.getMoveChoices(character)
+        # TODO: send list of choices to player
+        # TODO: get choice from player
+        # character.location = choice
+        # TODO: notify everyone of player move
+        
+
+    def processSuggestion(self, character, suggestion):
+        # TODO: for each other player starting from the "left" clockwise
+            # TODO: notify player to disprove the suggestion
+            # TODO: get reponse (card)
+            # TODO: if a card is returned
+                # TODO: notify everyone the player disproved it
+                # TODO: notify suggester of the card
+                # TODO: break
+            # TODO: notify everyone the player couldn't disprove it
+        # TODO: notify the suggester no one could disprove it
+        return # << placeholder to get rid of error
+
+    def processAccusation(self, character, accusation):
+        if not accusation == self.solution:
+            character.hasAccused = True
+
+            # move player if they are in a hallway
+            if character.location in Hallways:
+                choices = self.board.getMoveChoices(character)
+                character.location = random.choice(choices)
+
+            # TODO: notify the player they're wrong and can no longer take turns
+        else:
+            return # << placeholder to get rid of error
+            # TODO: end game, notify everyone of solution and winner
 
     def processTurn(self, character):
         # TODO: notify player it's their turn
@@ -117,9 +154,9 @@ class Game:
             #if action == "MOVE":
                 #processMove()
             #elif action == "SUGGEST":
-                #processSuggest()
+                #processSuggestion()
             #elif action == "ACCUSE":
-                #processAccuse():
+                #processAccusation():
             #elif action == "END_TURN":
             #    break
             
