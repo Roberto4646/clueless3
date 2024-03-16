@@ -24,16 +24,20 @@ ALL_HALLWAYS = ["Study-Hall", "Hall-Lounge", "Lounge-Dining Room", "Dining Room-
      "Conservatory-Library", "Library-Study", "Hall-Billiard Room", "Dining Room-Billiard Room", "Ballroom-Billiard Room", "Library-Billiard Room"]
 
 class Game:
-    def __init__(self):
+    def __init__(self, gid):
         self.characters = []
         self.board = Board()
         self.solution = {}
+        self.gid = gid
 
         self.playerIds = [] # some type of way to keep track of who to send messages to. Can be changed when we get to the messaging
         self.playerToCharacter = {}
 
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
+
+    def __str__(self):
+        return "GID: " + str(self.gid) + ", Solution: " + str(self.solution)
 
     def setupGame(self):
         # set up the solution for the game 
