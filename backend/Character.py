@@ -4,6 +4,7 @@ class Character:
         self.hand = None
         self.location = location
         self.name = name
+        self.hasMoved = False
         self.hasSuggested = False
         self.hasAccused = False
         self.isPlayer = False

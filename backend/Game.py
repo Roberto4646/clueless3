@@ -109,11 +109,7 @@ class Game:
                 if self.playerToCharacter[p].name == c:
                     ordered_playerIds.append(p)
         self.playerIds = ordered_playerIds
-        # characterPlayers = [(character, playerId) for playerId, character in self.playerToCharacter.items()]
-        # sorted_characterPlayers = sorted(characterPlayers, key=lambda x: x[0].name.upper()) # sort by the order the enums are defined, hopefully
-        # # rearrange playerId list - probably most non-repetitive way
-        # newPlayerIds = [x[1] for x in sorted_characterPlayers]
-        # self.playerIds = newPlayerIds
+
         self.currentTurn = 0
     
     def getCharacter(self, character_name):
@@ -150,12 +146,12 @@ class Game:
         character = self.playerToCharacter[playerId] # TODO: check playerid is in here
         canMove = False
         canSuggest = False
-        canAccuse = False
+        canAccuse = not character.hasAccused
 
         # if player is still active in game
         if not character.hasAccused:
             # if player is not blocked
-            if len(self.board.getMoveChoices(character, self.characters)) > 0:
+            if not character.hasMoved and len(self.board.getMoveChoices(character, self.characters)) > 0:
                 canMove = True
 
             # if player has not made a suggestion this turn
@@ -166,64 +162,69 @@ class Game:
 
         return canMove, canSuggest, canAccuse
 
-    def startMove(self, character):
-        #choices = self.board.getMoveChoices(character)
-        # TODO: send list of choices to player
-        # TODO: get choice from player
-        # character.location = choice
-        # TODO: notify everyone of player move
+    def startMove(self, playerId):
+        character = self.playerToCharacter[playerId]
+        choices = self.board.getMoveChoices(character, self.characters)
+        return choices
+    
+    def move(self, playerId, location):
+        character = self.playerToCharacter[playerId]
+        valid = location in self.board.getMoveChoices(character, self.characters)
+
+        if valid:
+            character = self.playerToCharacter[playerId]
+            if location in set(room.value for room in Rooms):
+                character.location = Rooms(location)
+            elif location in set(hall.value for hall in Hallways):
+                character.location = Hallways(location)
+
+            character.hasMoved = True
+
+        return valid
+        
+    def endTurn(self, playerId):
+        # TODO: set next turn player
         return
+
+    def processSuggestion(self, playerId, suspect, room, weapon):
+        character = self.playerToCharacter[playerId]
+        character.hasSuggested = True
+        nextPlayerToDisprove = -1
+        # TODO: track the player who made the suggestion
+        # TODO: track the suggestion
+        # TODO: track the next player to request proof, starts "left" clockwise 
+        # TODO: return next to player to request proof
+        return nextPlayerToDisprove
+
+    
+    def disproveSuggestion(self, playerId, proof):
+        success = False
+        nextPlayerToDisprove = -1
+        suggester = -1
+        suggestion = []
+        # TODO: validate player to disprove
+        # TODO: validate proof with player
+        # TODO: validate proof to suggestion
+        # TODO: iterate to next player if cannot disprove
+        # TODO: end disprove tracking if can disprove
+        return success, nextPlayerToDisprove, suggester, suggestion
+
+    def processAccusation(self, playerId, suspect, room, weapon):
+        character = self.playerToCharacter[playerId]
+        character.hasAccused = True
+        success = False
         
-
-    def processSuggestion(self, character, suggestion):
-        #order = [Suspects.MISS_SCARLET, Suspects.COLONEL_MUSTARD, Suspects.MRS_WHITE, SUSPECTS.MR_GREEN ]
-        # TODO: for each other player starting from the "left" clockwise
-            # TODO: notify player to disprove the suggestion
-            # TODO: get reponse (card)
-            # TODO: if a card is returned
-                # TODO: notify everyone the player disproved it
-                # TODO: notify suggester of the card
-                # TODO: break
-            # TODO: notify everyone the player couldn't disprove it
-        # TODO: notify the suggester no one could disprove it
-        return # << placeholder to get rid of error
-
-    def processAccusation(self, character, accusation):
-        if not accusation == self.solution:
-            character.hasAccused = True
-
-            # move player if they are in a hallway
-            # if character.location in Hallways:
-            #     choices = self.board.getMoveChoices(character)
-            #     character.location = random.choice(choices)
-
-            # TODO: notify the player they're wrong and can no longer take turns
-        else:
+        if (not self.solution['Suspects'] == suspect) or \
+            (not self.solution['Rooms'] == room) or \
+                (not self.solution['Weapons'] == weapon):
+            # TODO: move player to one of the neighboring rooms if they are in a hallway
             return # << placeholder to get rid of error
-            # TODO: end game, notify everyone of solution and winner
-
-    def processTurn(self, player):
-        # TODO: notify player it's their turn
+        else:
+            success = True # << placeholder to get rid of error
+            # TODO: end game
         
-        # process turn actions until turn ends
-        activeTurn = True
-        while (activeTurn):
-            actions = self.getTurnActions(player) 
-            # TODO: notify player of available turn actions
-            # TODO: get response
-            action = "" 
-
-            #if action == "MOVE":
-                #processMove()
-            #elif action == "SUGGEST":
-                #processSuggestion()
-            #elif action == "ACCUSE":
-                #processAccusation():
-            #elif action == "END_TURN":
-            #    break
-            
-        
-#TODO: make functions accept PID not character object     
+        return success
+         
         
 
 
