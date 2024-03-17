@@ -1,21 +1,24 @@
 from enum import Enum
 
+# sorted by position on the original board; starting with MISS_SCARLET
 class Suspects(Enum):
   MISS_SCARLET = "Miss Scarlet"
-  PROFESSOR_PLUM = "Professor Plum"
-  MR_GREEN = "Mr. Green"
+  COLONEL_MUSTARD = "Colonel Mustard"
   MRS_WHITE = "Mrs. White"
+  MR_GREEN = "Mr. Green"
   MRS_PEACOCK = "Mrs. Peacock"
+  PROFESSOR_PLUM = "Professor Plum"
 
 #character = Suspects.MISS_SCARLET
 #print(character.name)  # Output: Miss Scarlet    
 
 class CharacterStarts(Enum):
   MISS_SCARLET_START = "Miss Scarlet Start"
-  PROFESSOR_PLUM_START = "Professor Plum Start"
-  MR_GREEN_START = "Mr. Green Start"
+  COLONEL_MUSTARD_START = "Colonel Mustard Start"
   MRS_WHITE_START = "Mrs. White Start"
+  MR_GREEN_START = "Mr. Green Start"
   MRS_PEACOCK_START = "Mrs. Peacock Start"
+  PROFESSOR_PLUM_START = "Professor Plum Start"
 
 class Weapons(Enum):
   ROPE = "Rope"
