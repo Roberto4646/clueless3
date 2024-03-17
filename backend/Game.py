@@ -12,16 +12,8 @@ from Card import *
 from Board import * 
 from Enums import *
 
-#from Enums.py import Suspects, CharacterStarts, Weapons, Rooms
+#from Enums.py import Suspects#, CharacterStarts, Weapons, Rooms
 import random
-
-ALL_CHARACTERS = ["Miss Scarlet", "Professor Plum", "Mr. Green", "Mrs. White", "Mrs. Peacock"]
-ALL_CHARACTER_STARTS = ["Miss Scarlet Start", "Professor Plum Start", "Mr. Green Start", "Mrs. White Start", "Mrs. Peacock Start"]
-
-ALL_WEAPONS = ["Rope", "Lead Pipe", "Knife", "Wrench", "Candlestick", "Revolver"]
-ALL_ROOMS = ["Study", "Hall", "Lounge", "Library", "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"]
-ALL_HALLWAYS = ["Study-Hall", "Hall-Lounge", "Lounge-Dining Room", "Dining Room-Kitchen", "Kitchen-Ballroom", "Ballroom-Conservatory",
-     "Conservatory-Library", "Library-Study", "Hall-Billiard Room", "Dining Room-Billiard Room", "Ballroom-Billiard Room", "Library-Billiard Room"]
 
 class Game:
     def __init__(self, gid):
@@ -32,6 +24,8 @@ class Game:
 
         self.playerIds = [] # some type of way to keep track of who to send messages to. Can be changed when we get to the messaging
         self.playerToCharacter = {}
+        self.currentTurn = 0 # whose turn = playerIds[currentTurn]
+
 
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
@@ -62,8 +56,10 @@ class Game:
                 solutionCardNumbers.append(card_number) 
         
         # set name and location of all characters on board
-        for i in range(len(ALL_CHARACTERS)): 
-            character = Character(ALL_CHARACTERS[i], ALL_CHARACTER_STARTS[i])
+        all_characters = list(Suspects)
+        all_character_starts = list(CharacterStarts)
+        for i in range(len(all_characters)): 
+            character = Character(all_characters[i], all_character_starts[i])
             self.characters.append(character)
 
         # set up remaining card
@@ -97,13 +93,61 @@ class Game:
             cards = randomizedCardsLeft[cardsDealt:cardsDealt+numCardsToDeal]
             cardsDealt += numCardsToDeal
             random_character.setHand(cards)
+
+        # set up weapon locations
+        shuffledRooms = list(Rooms)
+        random.shuffle(shuffledRooms)
+        weaponsList = list(Weapons)
+        for i in range(len(weaponsList)):
+            self.board.weaponLocations[weaponsList[i]] = shuffledRooms[i]        
+
+        # set up player order
+        # some ugly code but hopefully it workds
+        ordered_playerIds = []        
+        for c in list(Suspects):
+            for p in self.playerIds:
+                if self.playerToCharacter[p].name == c:
+                    ordered_playerIds.append(p)
+        self.playerIds = ordered_playerIds
+        # characterPlayers = [(character, playerId) for playerId, character in self.playerToCharacter.items()]
+        # sorted_characterPlayers = sorted(characterPlayers, key=lambda x: x[0].name.upper()) # sort by the order the enums are defined, hopefully
+        # # rearrange playerId list - probably most non-repetitive way
+        # newPlayerIds = [x[1] for x in sorted_characterPlayers]
+        # self.playerIds = newPlayerIds
+        self.currentTurn = 0
     
     def getCharacter(self, character_name):
         for c in self.characters:
             if c.name == character_name:
                 return c
 
-    def getTurnActions(self, character):
+    def getCharacterForPlayer(self, playerId):
+        return self.playerToCharacter[playerId].name.value
+
+    def getHandForPlayer(self, playerId):
+        return self.playerToCharacter[playerId].hand
+
+    def getBoard(self):
+        # accumulate all character and weapon positions
+        # the client should have a representation of the board hard coded
+        character_locations = [(c.name.value, c.location.value) for c in self.characters]
+        weapon_locations = [(w.value, l.value) for w,l in self.board.weaponLocations.items()]
+        return character_locations + weapon_locations # as just 1 array of (name, location)
+
+    def getCurrentTurn(self):
+        playerId = self.playerIds[self.currentTurn]
+        return playerId, self.getCharacterForPlayer(playerId)
+
+    def getTurnOrder(self):
+        characterList = [s.value for s in list(Suspects)]
+        charactersInOrderFromCurrent = characterList[self.currentTurn:] + characterList[:self.currentTurn]
+        return charactersInOrderFromCurrent
+
+    def getPlayerIds(self):
+        return self.playerIds
+
+    def getTurnActions(self, playerId):
+        character = self.playerToCharacter[playerId] # TODO: check playerid is in here
         canMove = False
         canSuggest = False
         canAccuse = False
@@ -111,7 +155,7 @@ class Game:
         # if player is still active in game
         if not character.hasAccused:
             # if player is not blocked
-            if self.board.getMoveChoices(character.location) > 0:
+            if len(self.board.getMoveChoices(character, self.characters)) > 0:
                 canMove = True
 
             # if player has not made a suggestion this turn
@@ -122,15 +166,17 @@ class Game:
 
         return canMove, canSuggest, canAccuse
 
-    def processMove(self, character):
-        choices = self.board.getMoveChoices(character)
+    def startMove(self, character):
+        #choices = self.board.getMoveChoices(character)
         # TODO: send list of choices to player
         # TODO: get choice from player
         # character.location = choice
         # TODO: notify everyone of player move
+        return
         
 
     def processSuggestion(self, character, suggestion):
+        #order = [Suspects.MISS_SCARLET, Suspects.COLONEL_MUSTARD, Suspects.MRS_WHITE, SUSPECTS.MR_GREEN ]
         # TODO: for each other player starting from the "left" clockwise
             # TODO: notify player to disprove the suggestion
             # TODO: get reponse (card)
@@ -147,22 +193,22 @@ class Game:
             character.hasAccused = True
 
             # move player if they are in a hallway
-            if character.location in Hallways:
-                choices = self.board.getMoveChoices(character)
-                character.location = random.choice(choices)
+            # if character.location in Hallways:
+            #     choices = self.board.getMoveChoices(character)
+            #     character.location = random.choice(choices)
 
             # TODO: notify the player they're wrong and can no longer take turns
         else:
             return # << placeholder to get rid of error
             # TODO: end game, notify everyone of solution and winner
 
-    def processTurn(self, character):
+    def processTurn(self, player):
         # TODO: notify player it's their turn
         
         # process turn actions until turn ends
         activeTurn = True
         while (activeTurn):
-            actions = self.getTurnActions(character) 
+            actions = self.getTurnActions(player) 
             # TODO: notify player of available turn actions
             # TODO: get response
             action = "" 
@@ -177,7 +223,7 @@ class Game:
             #    break
             
         
-        
+#TODO: make functions accept PID not character object     
         
 
 

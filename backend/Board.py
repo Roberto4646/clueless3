@@ -28,12 +28,18 @@ class Board:
             Hallways.HALL_BILLIARD: [Rooms.HALL, Rooms.BILLIARD],
             Hallways.DINING_BILLIARD: [Rooms.DINING, Rooms.BILLIARD],
             Hallways.BALLROOM_BILLIARD: [Rooms.BALLROOM, Rooms.BILLIARD],
-            Hallways.LIBRARY_BILLIARD: [Rooms.LIBRARY, Rooms.BILLIARD]
+            Hallways.LIBRARY_BILLIARD: [Rooms.LIBRARY, Rooms.BILLIARD],
+            CharacterStarts.MISS_SCARLET_START: [Hallways.HALL_LOUNGE],
+            CharacterStarts.COLONEL_MUSTARD_START: [Hallways.LOUNGE_DINING],
+            CharacterStarts.MR_GREEN_START: [Hallways.BALLROOM_CONSERVATORY],
+            CharacterStarts.MRS_WHITE_START: [Hallways.KITCHEN_BALLROOM],
+            CharacterStarts.PROFESSOR_PLUM_START: [Hallways.LIBRARY_STUDY],
+            CharacterStarts.MRS_PEACOCK_START: [Hallways.CONSERVATORY_LIBRARY]
         }
-
-    def getMoveChoices(self, character, characters):
+        #self.playerLocations = {}
+    def getMoveChoices(self, player, characters):
         possible_moves = []
-        current_location = character.location
+        current_location = player.location
 
         # Check connected rooms based on the board data
         for connection in self.board[current_location]:
@@ -43,8 +49,7 @@ class Board:
         # Check connected hallways if theyre not occupied
         for connection in self.board[current_location]:
             if isinstance(connection, Hallways):
-                other_room = (set(self.board[current_location]) - {connection}).pop()  # Get connected room
-                if not any(char.location == other_room.value for char in characters):  # Check if unoccupied
+                if not any(char.location == connection for char in characters):  # Check if unoccupied
                     possible_moves.append(connection.value)
 
         return possible_moves
