@@ -9,7 +9,7 @@ function App() {
   const [gid, setGID] = useState(-1);
   const [notifBanner, setNotifBanner] = useState("");
   const [gidInput, setGIDInput] = useState("");
-  const [lobbyList, setLobbyList] = useState("");
+  const [lobbyList, setLobbyList] = useState([]);
   const [charName, setCharName] = useState("");
   const [actions, setActions] = useState([]);
   const [hand, setHand] = useState([]);
@@ -37,7 +37,7 @@ function App() {
       });
 
       socket.on('LOBBY_STATUS', function (data) {
-        setLobbyList(data.join());
+        setLobbyList(data);
       });
 
       socket.on('PLAYER_WHOAMI', function (data) {
@@ -102,8 +102,33 @@ function App() {
   }
 
   const accuse = () => {
-    // TODO: Send form input in the TURN_ACTION message
-    socket.emit("TURN_ACTION", ["ACCUSE"]);
+    var suspect, room, weapon
+    var suspectRadios = document.getElementsByName("suspects");
+    var roomRadios = document.getElementsByName("room");
+    var weaponRadios = document.getElementsByName("weapons");
+    for(var i = 0; i < suspectRadios.length; i++) {
+        if(suspectRadios[i].checked) {
+          suspect = suspectRadios[i].value;
+          console.log(suspectRadios[i].value);
+          break;
+        }
+    }
+    for(i = 0; i < weaponRadios.length; i++) {
+      if(weaponRadios[i].checked) {
+        weapon = weaponRadios[i].value;
+        console.log(weaponRadios[i].value);
+        break;
+      }
+    }
+    for(i = 0; i < roomRadios.length; i++) {
+      if(roomRadios[i].checked) {
+        room = roomRadios[i].value;
+        console.log(roomRadios[i].value);
+        break;
+      }
+    }
+    
+    socket.emit("TURN_ACTION", ["ACCUSE", suspect, room, weapon]);
   }
 
   // HTML Rendering --------------------------------------------------
@@ -120,53 +145,70 @@ function App() {
   }
   
   const renderBoard = () => {
-    return board.join();
+    console.log(board)
+    var output = ""
+    
+    for(var i = 0; i < board.length; i++) {
+      //<char> is in <location> 
+      output += board[i][0] + " is at " + board[i][1] + "\n";
+    }
+    return output;
+    // {output}
   }
 
+  const renderLobbyList = () => {
+    var output = ""
+
+    for(var i = 0; i < lobbyList.length; i++) {
+      //<char> is in <location> 
+      output += lobbyList[i] + "\n";
+    }
+    return output;
+    // {output}
+  }
   const renderSuggestion = () => {
     return suggestion.join();
   }
 
   const renderMoveChoice = (data) => {
     return (
-      <button onClick={() => socket.emit("TURN_ACTION", ["MOVE", data])}> {data} </button>
+      <button className="button-modern" onClick={() => socket.emit("TURN_ACTION", ["MOVE", data])}> {data} </button>
     )
   }
 
   const renderAccusation = () => {
     return (
       <div>
-        <button onClick={() => accuse()}>Make Accusation</button>
-        {/* TODO: Make form for accusation choices*/}
-        {/* <form>
+        <button className="button-modern" onClick={() => accuse()}>Make Accusation</button>
+        {<form>
           <fieldset id="suspects">
-            <label><input type="radio" value="Colonel Mustard" name="suspects"></input>Colonel Mustard</label>
-            <label><input type="radio" value="Miss Scarlet" name="suspects"></input>Miss Scarlet</label>
-            <label><input type="radio" value="Professor Plum" name="suspects"></input>Professor Plum</label>
-            <label><input type="radio" value="Mr.Green" name="suspects"></input>Mr.Green</label>
-            <label><input type="radio" value="Mrs.White" name="suspects"></input>Mrs.White</label>
-            <label><input type="radio" value="Mrs.Peacock" name="characters"></input>Mrs.Peacock</label>
+            <label><input type="radio" class="radio-button" value="Colonel Mustard" name="suspects"></input>Colonel Mustard</label>
+            <label><input type="radio" class="radio-button" value="Miss Scarlet" name="suspects"></input>Miss Scarlet</label>
+            <label><input type="radio" class="radio-button" value="Professor Plum" name="suspects"></input>Professor Plum</label>
+            <label><input type="radio" class="radio-button" value="Mr.Green" name="suspects"></input>Mr.Green</label>
+            <label><input type="radio" class="radio-button" value="Mrs.White" name="suspects"></input>Mrs.White</label>
+            <label><input type="radio" class="radio-button" value="Mrs.Peacock" name="suspects"></input>Mrs.Peacock</label>
           </fieldset>
           <fieldset id="weapons">
-            <label><input type="radio" value="Rope" name="weapons"></input>Rope</label>
-            <label><input type="radio" value="Lead Pipe" name="weapons"></input>Lead Pipe</label>
-            <label><input type="radio" value="Knife" name="weapons"></input>Knife</label>
-            <label><input type="radio" value="Wrench" name="weapons"></input>Wrench</label>
-            <label><input type="radio" value="Candlestick" name="weapons"></input>Candlestick</label>
-            <label><input type="radio" value="Revolver" name="weapons"></input>Revolver</label>
+            <label><input type="radio" class="radio-button" value="Rope" name="weapons"></input>Rope</label>
+            <label><input type="radio" class="radio-button" value="Lead Pipe" name="weapons"></input>Lead Pipe</label>
+            <label><input type="radio" class="radio-button" value="Knife" name="weapons"></input>Knife</label>
+            <label><input type="radio" class="radio-button" value="Wrench" name="weapons"></input>Wrench</label>
+            <label><input type="radio" class="radio-button" value="Candlestick" name="weapons"></input>Candlestick</label>
+            <label><input type="radio" class="radio-button" value="Revolver" name="weapons"></input>Revolver</label>
           </fieldset>
           <fieldset id="room">
-            <label><input type="radio" value="Study" name="room"></input>Study</label>
-            <label><input type="radio" value="Hall" name="room"></input>Hall</label>
-            <label><input type="radio" value="Lounge" name="room"></input>Lounge</label>
-            <label><input type="radio" value="Library" name="room"></input>Library</label>
-            <label><input type="radio" value="Billiard Room" name="room"></input>Billiard Room</label>
-            <label><input type="radio" value="Dining Room" name="room"></input>Dining Room</label>
-            <label><input type="radio" value="Conservatory" name="room"></input>Conservatory</label>
-            <label><input type="radio" value="Ballroom" name="room"></input>Ballroom</label>
-            <label><input type="radio" value="Kitchen" name="room"></input>Kitchen</label>
+            <label><input type="radio" class="radio-button" value="Study" name="room"></input>Study</label>
+            <label><input type="radio" class="radio-button" value="Hall" name="room"></input>Hall</label>
+            <label><input type="radio" class="radio-button" value="Lounge" name="room"></input>Lounge</label>
+            <label><input type="radio" class="radio-button" value="Library" name="room"></input>Library</label>
+            <label><input type="radio" class="radio-button" value="Billiard Room" name="room"></input>Billiard Room</label>
+            <label><input type="radio" class="radio-button" value="Dining Room" name="room"></input>Dining Room</label>
+            <label><input type="radio" class="radio-button" value="Conservatory" name="room"></input>Conservatory</label>
+            <label><input type="radio" class="radio-button" value="Ballroom" name="room"></input>Ballroom</label>
+            <label><input type="radio" class="radio-button" value="Kitchen" name="room"></input>Kitchen</label>
           </fieldset>
-        </form> */}
+        </form>}
       </div>
       
     )
@@ -174,36 +216,56 @@ function App() {
 
   return (
     <div className="App">
-      <header>
+      <header class="header">
         Clue-less
       </header>
-      
         {/* buttons for each message */}
-        <div><button onClick={() => createLobby()}>Create Lobby</button></div>
-        <div>
-          <button onClick={() => joinLobby()}>Join Lobby</button>
-          <input type="text" value={gidInput} onChange={e => setGIDInput(e.target.value)} />
+      <div className="left-box">
+        <header class="box-header">
+          Options
+        </header>
+        <div class="button-column">
+          <div><button className="button-modern" onClick={() => createLobby()}>Create Lobby</button></div>
+          <div>
+            <button className="button-modern" onClick={() => joinLobby()}>Join Lobby</button>
+            <input type="text" className="input-modern" value={gidInput} onChange={e => setGIDInput(e.target.value)} />
+          </div>
+          <div><button className="button-modern" onClick={() => startGame()}>Start Game</button></div>
         </div>
-        <div><button onClick={() => startGame()}>Start Game</button></div>
-        <div><button onClick={() => move()}>Move</button></div>
-        <div> Move Choices: {moveChoices.map(renderMoveChoice, this)} </div> {/* temp for skeletal */}
-        <div><button onClick={() => suggest()}>Make Suggestion</button></div>
-        {renderAccusation()}
-        <div><button onClick={() => endTurn()}>End Turn</button></div>
+        <div class="button-column">
+          <div><button className="button-modern" onClick={() => suggest()}>Make Suggestion</button></div>
+            {renderAccusation()}
+          <div><button style={{ marginRight: "15px" }} className="button-modern" onClick={() => move()}>Move</button>
+          Move Choices: {moveChoices.map(renderMoveChoice, this)} </div>
+          <div><button className="button-modern" onClick={() => endTurn()}>End Turn</button></div>
+        </div>
+      </div>
+
         
         {/* display info */}
-        <div> The PID: {pid} </div>
-        <div> The GID: {gid} </div>
-        <div> Current Notification : {notifBanner} </div>
-        <div> Character Name: {charName} </div>
-        <div> Available Actions: {renderActions()} </div>
-        <div> Player Hand: {renderHand()} </div>
-        <div> Turn Order: {renderTurnOrder()} </div>
-        <div> Current Turn: {turnCurr} </div>
-        <div> Board: {renderBoard()} </div>
-        <div> Disprove this Suggestion: {renderSuggestion()} </div> {/* temp for skeletal */}
-        <div> Lobby Members: {lobbyList}</div>
-      
+      <div className="content-container">
+        <div className="center-box">
+          <header class="box-header">
+            Static Info 
+          </header>
+          <div> The PID: {pid} </div>
+          <div> The GID: {gid} </div>
+          <div> Character Name: {charName} </div>
+          <div> Player Hand: {renderHand()} </div>
+          <div> Turn Order: {renderTurnOrder()} </div>
+          <div> Disprove this Suggestion: {renderSuggestion()} </div> {/* temp for skeletal */}
+        </div>
+        <div className="right-box">
+          <header class="box-header">
+            Dynamic Info
+          </header>
+          <div> Current Notification : {notifBanner} </div>
+          <div> Available Actions: {renderActions()} </div>
+          <div> Current Turn: {turnCurr} </div>
+          <div> Lobby Members: <pre>{renderLobbyList()}</pre></div>
+          <div> Board: <pre>{renderBoard()}</pre> </div>
+        </div>
+      </div>
     </div>
   );
 }
