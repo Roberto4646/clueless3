@@ -1,7 +1,6 @@
 from Game import *
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
-import uuid
 import random
 from flask_cors import CORS
 
@@ -58,7 +57,7 @@ def handle_create_game():
      
     # send the client their id and the lobby code for others to join
     emit("LOBBY_CODE", [pid, gid])
-    emit("LOBBY_STATUS", [pid, gid], to=gid)
+    emit("LOBBY_STATUS", game_id_game[gid].getPlayerIds(), to=gid)
     emit("NOTIFICATION", ["You created a Clue-less game lobby."])
     printState()
 
@@ -109,10 +108,11 @@ def handle_game_start(gid):
     currentPlayer, currentCharacter = game.getCurrentTurn()
     emit("TURN_CURRENT", [currentCharacter], to=gid)
     emit("TURN_ORDER", [game.getTurnOrder()], to=gid)
-    emit("GAME_BOARD", [game.getBoard()], to=gid) 
+    emit("GAME_BOARD", game.getBoard(), to=gid) 
 
     # send starting player their available turn actions
     emit("PLAYER_ACTIONS", [game.getTurnActions(currentPlayer)], to=currentPlayer)
+    printState()
 
 @socketio.on('TURN_ACTION')
 def handle_turn_action(data):
@@ -121,8 +121,8 @@ def handle_turn_action(data):
     # parse turn action
     action = data[0]
     params = data[1:]
-    print(action)
-    print(params)
+    # print(action)
+    # print(params)
 
     pid = request.sid
     gid = players_in_game[pid]
@@ -140,7 +140,7 @@ def handle_turn_action(data):
                 emit("MOVE_CHOICES", [])
                 emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
                 emit("NOTIFICATION", ["User " + str(pid) + " has moved to "+params[0]+"."], to=gid)
-                emit("GAME_BOARD", [game.getBoard()], to=gid)
+                emit("GAME_BOARD", game.getBoard(), to=gid)
             else:
                 emit("NOTIFICATION", ["Invalid location choice."])
     elif action == "SUGGEST":

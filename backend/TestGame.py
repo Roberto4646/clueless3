@@ -10,10 +10,10 @@ class TestGame(unittest.TestCase):
         assert 0 == 0, "should be 0"
 
     def test_init(self):
-        game = Game()
+        game = Game(1221)
 
     def test_addPlayer(self):
-        game = Game()
+        game = Game(1221)
         playerId1 = "player1"
         playerId2 = "player2"
 
@@ -29,12 +29,26 @@ class TestGame(unittest.TestCase):
         assert playerId2 in game.playerIds
 
     def test_setupGame(self):
-        game = Game()
+        game = Game(1221)
         playerId1 = "player1"
         playerId2 = "player2"
         game.addPlayer(playerId1)
         game.addPlayer(playerId2)
         game.setupGame()
+
+
+    def test_init2(self):
+        game = Game(1221)
+        
+    def test_init3(self):
+        game = Game(1221)
+        
+    def test_init4(self):
+        game = Game(1221)
+        
+    def test_init5(self):
+        game = Game(1221)
+    
         
 
 

@@ -121,7 +121,7 @@ class Game:
         return self.playerToCharacter[playerId].name.value
 
     def getHandForPlayer(self, playerId):
-        return self.playerToCharacter[playerId].hand
+        return [Card().get_card_by_number(index)[1] for index in self.playerToCharacter[playerId].hand]
 
     def getBoard(self):
         # accumulate all character and weapon positions
@@ -217,11 +217,16 @@ class Game:
         if (not self.solution['Suspects'] == suspect) or \
             (not self.solution['Rooms'] == room) or \
                 (not self.solution['Weapons'] == weapon):
+                
             # TODO: move player to one of the neighboring rooms if they are in a hallway
-            return # << placeholder to get rid of error
+            if(character.location in Hallways):
+                #array of strings
+                location = random.choice(self.board.getMoveChoices(character, self.characters))
+                self.move(self, playerId, Rooms(location))
         else:
             success = True # << placeholder to get rid of error
-            # TODO: end game
+            #TODO: end game
+
         
         return success
          
