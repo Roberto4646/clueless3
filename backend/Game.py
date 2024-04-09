@@ -8,7 +8,7 @@
 #from enums import Hallways
 
 from Character import * 
-from Card import *
+import Card
 from Board import * 
 from Enums import *
 
@@ -26,7 +26,6 @@ class Game:
         self.playerToCharacter = {}
         self.currentTurn = 0 # whose turn = playerIds[currentTurn]
 
-
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
 
@@ -41,7 +40,6 @@ class Game:
         room_range = range(13, 22)
         ranges = [suspect_range, weapon_range, room_range]
         weights = [1, 1, 2]
-        dummyCard = Card()
 
         #couldn't we just loop over the ranges? i think the weights are a little unnecessary
         #for category in ["Suspect", "Weapon", "Room"]:
@@ -49,7 +47,7 @@ class Game:
             #chosen_range = random.choices(ranges, weights=weights)[0] 
             #This doesn't behave in the way we think it does. Weights didn't guarantee that the [0th] choice would be a type of card that we didn't have already
             card_number = random.choice(chosen_range)
-            card_info = dummyCard.get_card_by_number(card_number)
+            card_info = Card.get_card_by_number(card_number)
             if card_info:
                 card_type, name = card_info
                 self.solution[card_type] = name
@@ -121,7 +119,7 @@ class Game:
         return self.playerToCharacter[playerId].name.value
 
     def getHandForPlayer(self, playerId):
-        return [Card().get_card_by_number(index)[1] for index in self.playerToCharacter[playerId].hand]
+        return self.playerToCharacter[playerId].getHandCards()
 
     def getBoard(self):
         # accumulate all character and weapon positions
