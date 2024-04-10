@@ -2,6 +2,12 @@ import './App.css';
 import io from 'socket.io-client';
 import React from 'react';
 import { useState, useEffect} from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+
+import GameLobbyPage from './components/GameLobbyPage';
+import CreateLobbyPage from './components/CreateLobbyPage';
+import MainGamePage from './components/MainGamePage';
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -18,6 +24,7 @@ function App() {
   const [board, setBoard] = useState([]);
   const [suggestion, setSuggestion] = useState([]); // just temp for skeletal
   const [moveChoices, setMoveChoices] = useState([]); // just temp for skeletal
+
   
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
@@ -215,58 +222,26 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <header class="header">
-        Clue-less
-      </header>
-        {/* buttons for each message */}
-      <div className="left-box">
-        <header class="box-header">
-          Options
-        </header>
-        <div class="button-column">
-          <div><button className="button-modern" onClick={() => createLobby()}>Create Lobby</button></div>
-          <div>
-            <button className="button-modern" onClick={() => joinLobby()}>Join Lobby</button>
-            <input type="text" className="input-modern" value={gidInput} onChange={e => setGIDInput(e.target.value)} />
-          </div>
-          <div><button className="button-modern" onClick={() => startGame()}>Start Game</button></div>
-        </div>
-        <div class="button-column">
-          <div><button className="button-modern" onClick={() => suggest()}>Make Suggestion</button></div>
-            {renderAccusation()}
-          <div><button style={{ marginRight: "15px" }} className="button-modern" onClick={() => move()}>Move</button>
-          Move Choices: {moveChoices.map(renderMoveChoice, this)} </div>
-          <div><button className="button-modern" onClick={() => endTurn()}>End Turn</button></div>
-        </div>
-      </div>
-
-        
-        {/* display info */}
-      <div className="content-container">
-        <div className="center-box">
-          <header class="box-header">
-            Static Info 
-          </header>
-          <div> The PID: {pid} </div>
-          <div> The GID: {gid} </div>
-          <div> Character Name: {charName} </div>
-          <div> Player Hand: {renderHand()} </div>
-          <div> Turn Order: {renderTurnOrder()} </div>
-          <div> Disprove this Suggestion: {renderSuggestion()} </div> {/* temp for skeletal */}
-        </div>
-        <div className="right-box">
-          <header class="box-header">
-            Dynamic Info
-          </header>
-          <div> Current Notification : {notifBanner} </div>
-          <div> Available Actions: {renderActions()} </div>
-          <div> Current Turn: {turnCurr} </div>
-          <div> Lobby Members: <pre>{renderLobbyList()}</pre></div>
-          <div> Board: <pre>{renderBoard()}</pre> </div>
-        </div>
-      </div>
-    </div>
+    <Router>
+        <Routes>
+          <Route path="/" element={<CreateLobbyPage
+              onCreateLobby={createLobby}
+              onJoinLobby={joinLobby}
+              gidInput={gidInput}
+              setGIDInput={setGIDInput} 
+              />} />
+          <Route path="/game-lobby" element={<GameLobbyPage onStartGame={startGame} />} />
+          <Route path="/main-game" element={<MainGamePage
+              startGame={startGame}
+              suggest={suggest}
+              renderAccusation={renderAccusation}
+              move={move}
+              moveChoices={moveChoices}
+              renderMoveChoice={renderMoveChoice}
+              endTurn={endTurn}
+            />} />
+        </Routes>
+    </Router>
   );
 }
 
