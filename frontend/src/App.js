@@ -248,7 +248,11 @@ function App() {
               gidInput={gidInput}
               setGIDInput={setGIDInput} 
               />} />
-          <Route path="/game-lobby" element={<GameLobbyPage onStartGame={startGame} />} />
+          <Route path="/game-lobby" element={<GameLobbyPage 
+            onStartGame={startGame}
+            pid={pid} 
+            gid={gid}
+          />} />
           <Route path="/main-game" element={<MainGamePage
               startGame={startGame}
               suggest={suggest}
