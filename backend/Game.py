@@ -146,6 +146,9 @@ class Game:
     def getPlayerIds(self):
         return self.playerIds
 
+    def checkPlayerTurnValid(self, playerId):
+        return playerId == self.playerIds[self.currentTurn]
+
     def getTurnActions(self, playerId):
         character = self.playerToCharacter[playerId] # TODO: check playerid is in here
         canMove = False
@@ -187,8 +190,15 @@ class Game:
         return valid
         
     def endTurn(self, playerId):
-        # TODO: set next turn player
-        return
+        #reset the hasMoved/hasSuggested but not hasAccused
+        character = self.playerToCharacter[playerId]
+        if(character.hasMoved):
+            character.hasMoved = False
+        if(character.hasSuggested):
+            character.hasMoved = False     
+        #Update to the next player
+        self.currentTurn = (self.currentTurn + 1) % len(self.playerIds)
+        return self.playerIds[self.currentTurn] #next player
 
     def processSuggestion(self, playerId, suspect, room, weapon):
         character = self.playerToCharacter[playerId]

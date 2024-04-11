@@ -115,9 +115,7 @@ def handle_game_start(gid):
     printState()
 
 @socketio.on('TURN_ACTION')
-def handle_turn_action(data):
-    # TODO: validate pid (request.sid) as current turn player
-    
+def handle_turn_action(data):    
     # parse turn action
     action = data[0]
     params = data[1:]
@@ -128,8 +126,16 @@ def handle_turn_action(data):
     gid = players_in_game[pid]
     game = game_id_game[gid]
 
+    #Ensure the pid is the current player's turn
+    if not game.checkPlayerTurnValid(pid):
+        emit("NOTIFICATION", ["It is not your turn"], to=pid)
+        return
     if action == "END_TURN":
-        # TODO: end turn
+        nextPlayerId = game.endTurn(pid)
+        emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
+        emit("NOTIFICATION", ["User " + str(pid) + " has ended their turn and User " + str(nextPlayerId) + " is up next."], to=gid)        
+        currentPlayer, currentCharacter = game.getCurrentTurn()
+        emit("TURN_CURRENT", [currentCharacter], to=gid)
         emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
     elif action == "MOVE":
         if len(params) == 0:    # player chose to move
