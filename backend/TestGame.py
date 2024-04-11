@@ -139,6 +139,38 @@ class TestGame(unittest.TestCase):
         valid, details = game.suggestionValid(playerId, "Professor Plum", "not a knife")
         assert valid == False
 
+    def test_processSuggestion(self):
+        # suggestion should be valid for the game already
+        c = Character(Suspects.COLONEL_MUSTARD, Rooms.STUDY) 
+        playerId = "playerId1"
+        game = Game(0)
+        game.characters.append(c)
+        game.playerToCharacter[playerId] = c
+        # accused character
+        suspect_character = Character(Suspects.MRS_PEACOCK, Hallways.HALL_BILLIARD)
+        playerId2 = "playerId2"
+        game.characters.append(suspect_character)
+        game.playerToCharacter[playerId2] = suspect_character 
+        
+        # need at least another player in the game for disprove tracking
+        game.playerIds = [playerId, playerId2]
+
+        suspect, weapon = "Mrs. Peacock", "Candlestick"
+
+        valid, details = game.suggestionValid(playerId, suspect, weapon)
+        assert valid == True
+
+        if valid == True: 
+            room = details
+            nextPidToDisprove = game.processSuggestion(playerId, suspect, room, weapon)
+
+            assert suspect_character.location == Rooms(room) # study, where the suggester was
+            assert suspect_character.wasMovedViaSuggestion() == True
+            assert c.hasSuggested == True
+            assert nextPidToDisprove == playerId2
+
+            
+
 
 if __name__ == '__main__':
     unittest.main()

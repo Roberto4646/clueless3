@@ -191,18 +191,24 @@ class Game:
         return
 
     def processSuggestion(self, playerId, suspect, room, weapon):
+        """
+        suspect, room, weapon are strings. 
+        The player position/status and params should pass suggestionValid()
+
+        @return the pid of the next player to disprove this suggestion
+        """
         character = self.playerToCharacter[playerId]
         character.hasSuggested = True
         # TODO: track the player who made the suggestion
         # TODO: track the suggestion
         # TODO: track the next player to request proof, starts "left" clockwise 
         nextPidToDisprove = self.playerIds[(self.currentTurn + 1)%len(self.playerIds)]
-        self.suggestionTracker = (playerId, (suspect, room, weapon), nextPidToDisprove)
+        self.suggestionTracker = (playerId, (Suspects(suspect), Rooms(room), Weapons(weapon)), nextPidToDisprove)  
 
         # move suspect to room 
         suspect_character = self._getCharacterByName(suspect)
 
-        suspect_character.moveViaSuggestion(Rooms(room)) # cast should be valid. Room should've be obtained from character location
+        suspect_character.moveViaSuggestion(Rooms(room))
 
         # TODO: return next to player to request proof
         return nextPidToDisprove 
@@ -242,6 +248,12 @@ class Game:
         return success
     
     def suggestionValid(self, playerId, suspect, weapon):
+        """
+        suspect, weapon are strings. 
+        Whether the player's position/status and suggestion content are valid
+
+        @return (False, details) or (True, name of room suggested)
+        """
 
         character = self._getCharacterByPid(playerId)
         location = character.getLocation()
