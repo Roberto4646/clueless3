@@ -2,7 +2,7 @@ CARD_NUMBERS = {
   1: ("Suspects", "Miss Scarlet"),
   2: ("Suspects", "Professor Plum"),
   3: ("Suspects", "Mrs. Peacock"),
-  4: ("Suspects", "Reverend Green"),
+  4: ("Suspects", "Mr. Green"),
   5: ("Suspects", "Mrs. White"),
   6: ("Suspects", "Colonel Mustard"),
   7: ("Weapons", "Revolver"),

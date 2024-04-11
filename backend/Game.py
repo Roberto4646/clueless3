@@ -28,6 +28,8 @@ class Game:
 
         self.suggestionTracker = (None, None) # (playerId, (suspect, room, weapon), nextPlayerToDisprove)
 
+        self.isGameOver = False
+
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
 
@@ -102,7 +104,7 @@ class Game:
             self.board.weaponLocations[weaponsList[i]] = shuffledRooms[i]        
 
         # set up player order
-        # some ugly code but hopefully it workds
+        # some ugly code but hopefully it works
         ordered_playerIds = []        
         for c in list(Suspects):
             for p in self.playerIds:
@@ -251,9 +253,15 @@ class Game:
                 location = random.choice(self.board.getMoveChoices(character, self.characters))
                 self.move(self, playerId, Rooms(location))
         else:
-            success = True # << placeholder to get rid of error
-            #TODO: end game
+            success = True 
+            self.isGameOver = True
 
+            #Dunno if overkill, but turn hasMoved, hasSuggested, hasAccused to True
+            for pid in self.playerIds:
+                character = self._getCharacterByPid(pid)
+                character.hasMoved = True
+                character.hasSuggested = True
+                character.hasAccused = True
         
         return success
     

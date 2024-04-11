@@ -126,6 +126,9 @@ def handle_turn_action(data):
     gid = players_in_game[pid]
     game = game_id_game[gid]
 
+    if(game.isGameOver):
+        emit("NOTIFICATION", ["Game is over, you cannot make any more moves"], to=pid)
+        return
     #Ensure the pid is the current player's turn
     if not game.checkPlayerTurnValid(pid):
         emit("NOTIFICATION", ["It is not your turn"], to=pid)
@@ -193,6 +196,7 @@ def handle_turn_action(data):
 
         if success:
             emit("NOTIFICATION", ["User " + str(pid) + " has solved the mystery!"], to=gid)
+            emit("PLAYER_ACTIONS", [game.getTurnActions(pid)], to=gid)
         else:
             emit("NOTIFICATION", ["User " + str(pid) + " made a wrong accusation!"], to=gid)
 
