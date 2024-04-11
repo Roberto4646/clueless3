@@ -253,7 +253,7 @@ class Game:
         # if you weren't moved to the room by another player making a suggestion
 
         exits = self.board.getAdjacents(location)
-        char_locations = [c.location.value for c in self.characters]
+        char_locations = [c.location for c in self.characters]
 
         all_exits_blocked = len([loc for loc in exits if loc in char_locations]) == len(exits)
         if (all_exits_blocked and not self.board.isCornerRoom(location) and not character.wasMovedViaSuggestion()):
