@@ -22,9 +22,11 @@ class Game:
         self.solution = {}
         self.gid = gid
 
-        self.playerIds = [] # some type of way to keep track of who to send messages to. Can be changed when we get to the messaging
+        self.playerIds = [] # kept in turn order
         self.playerToCharacter = {}
         self.currentTurn = 0 # whose turn = playerIds[currentTurn]
+
+        self.suggestionTracker = (None, None) # (playerId, (suspect, room, weapon), nextPlayerToDisprove)
 
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
@@ -110,13 +112,18 @@ class Game:
 
         self.currentTurn = 0
     
-    def getCharacter(self, character_name):
+    def _getCharacterByName(self, character_name):
         for c in self.characters:
-            if c.name == character_name:
+            if c.getName() == character_name:
                 return c
+            
+        print(character_name + " not found in " + str(self.characters))
+    
+    def _getCharacterByPid(self, playerId):
+        return self.playerToCharacter[playerId]
 
     def getCharacterForPlayer(self, playerId):
-        return self.playerToCharacter[playerId].name.value
+        return self.playerToCharacter[playerId].getName()
 
     def getHandForPlayer(self, playerId):
         return self.playerToCharacter[playerId].getHandCards()
@@ -124,7 +131,7 @@ class Game:
     def getBoard(self):
         # accumulate all character and weapon positions
         # the client should have a representation of the board hard coded
-        character_locations = [(c.name.value, c.location.value) for c in self.characters]
+        character_locations = [(c.getName(), c.location.value) for c in self.characters]
         weapon_locations = [(w.value, l.value) for w,l in self.board.weaponLocations.items()]
         return character_locations + weapon_locations # as just 1 array of (name, location)
 
@@ -133,9 +140,8 @@ class Game:
         return playerId, self.getCharacterForPlayer(playerId)
 
     def getTurnOrder(self):
-        characterList = [s.value for s in list(Suspects)]
-        charactersInOrderFromCurrent = characterList[self.currentTurn:] + characterList[:self.currentTurn]
-        return charactersInOrderFromCurrent
+        turns = self.playerIds[self.currentTurn:] + self.playerIds[:self.currentTurn]
+        return [self.getCharacterForPlayer(p) for p in turns]
 
     def getPlayerIds(self):
         return self.playerIds
@@ -187,12 +193,19 @@ class Game:
     def processSuggestion(self, playerId, suspect, room, weapon):
         character = self.playerToCharacter[playerId]
         character.hasSuggested = True
-        nextPlayerToDisprove = -1
         # TODO: track the player who made the suggestion
         # TODO: track the suggestion
         # TODO: track the next player to request proof, starts "left" clockwise 
+        nextPidToDisprove = self.playerIds[(self.currentTurn + 1)%len(self.playerIds)]
+        self.suggestionTracker = (playerId, (suspect, room, weapon), nextPidToDisprove)
+
+        # move suspect to room 
+        suspect_character = self._getCharacterByName(suspect)
+
+        suspect_character.moveViaSuggestion(Rooms(room)) # cast should be valid. Room should've be obtained from character location
+
         # TODO: return next to player to request proof
-        return nextPlayerToDisprove
+        return nextPidToDisprove 
 
     
     def disproveSuggestion(self, playerId, proof):
@@ -227,9 +240,36 @@ class Game:
 
         
         return success
-         
+    
+    def suggestionValid(self, playerId, suspect, weapon):
+
+        character = self._getCharacterByPid(playerId)
+        location = character.getLocation()
         
+        # if in a room and 
+        if not self.board.isRoom(location): 
+            return False, "You are not allowed to make a suggestion. You are not in a room"
+        # if not (all exits blocked && not in corner rooms && weren't moved to another room by a player making a suggestion)
+        # if you weren't moved to the room by another player making a suggestion
 
+        exits = self.board.getAdjacents(location)
+        char_locations = [c.location.value for c in self.characters]
 
+        all_exits_blocked = len([loc for loc in exits if loc in char_locations]) == len(exits)
+        if (all_exits_blocked and not self.board.isCornerRoom(location) and not character.wasMovedViaSuggestion()):
+            return False, "You are not allowed to make a suggestion. All exits are blocked & you're not in a corner & you weren't moved to the room by another player via suggestion this round"
+
+        # check contents of suspect and weapon
+        try:
+            Suspects(suspect)
+        except ValueError:
+            return False, "Suggestion contents invalid: " + suspect
+        
+        try: 
+            Weapons(weapon)
+        except ValueError:
+            return False, "Suggestion contents invalid: " + weapon
+        
+        return True, location.value
 
     

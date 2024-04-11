@@ -53,3 +53,12 @@ class Board:
                     possible_moves.append(connection.value)
 
         return possible_moves
+
+    def getAdjacents(self, location):
+        return self.board[location]
+
+    def isCornerRoom(self, location): 
+        return location in [Rooms.STUDY, Rooms.LOUNGE, Rooms.CONSERVATORY, Rooms.KITCHEN]
+    
+    def isRoom(self, location):
+        return isinstance(location, Rooms)

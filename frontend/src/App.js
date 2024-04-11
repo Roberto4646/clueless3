@@ -98,7 +98,25 @@ function App() {
 
   const suggest = () => {
     // TODO: Send form input in the TURN_ACTION message
-    socket.emit("TURN_ACTION", ["SUGGEST"]);
+    var suspect, weapon
+    var suspectRadios = document.getElementsByName("suspects");
+    var weaponRadios = document.getElementsByName("weapons");
+    for(var i = 0; i < suspectRadios.length; i++) {
+        if(suspectRadios[i].checked) {
+          suspect = suspectRadios[i].value;
+          console.log(suspectRadios[i].value);
+          break;
+        }
+    }
+    for(i = 0; i < weaponRadios.length; i++) {
+      if(weaponRadios[i].checked) {
+        weapon = weaponRadios[i].value;
+        console.log(weaponRadios[i].value);
+        break;
+      }
+    }
+    
+    socket.emit("TURN_ACTION", ["SUGGEST", suspect, weapon]);
   }
 
   const accuse = () => {
@@ -185,9 +203,9 @@ function App() {
             <label><input type="radio" class="radio-button" value="Colonel Mustard" name="suspects"></input>Colonel Mustard</label>
             <label><input type="radio" class="radio-button" value="Miss Scarlet" name="suspects"></input>Miss Scarlet</label>
             <label><input type="radio" class="radio-button" value="Professor Plum" name="suspects"></input>Professor Plum</label>
-            <label><input type="radio" class="radio-button" value="Mr.Green" name="suspects"></input>Mr.Green</label>
-            <label><input type="radio" class="radio-button" value="Mrs.White" name="suspects"></input>Mrs.White</label>
-            <label><input type="radio" class="radio-button" value="Mrs.Peacock" name="suspects"></input>Mrs.Peacock</label>
+            <label><input type="radio" class="radio-button" value="Mr. Green" name="suspects"></input>Mr.Green</label>
+            <label><input type="radio" class="radio-button" value="Mrs. White" name="suspects"></input>Mrs.White</label>
+            <label><input type="radio" class="radio-button" value="Mrs. Peacock" name="suspects"></input>Mrs.Peacock</label>
           </fieldset>
           <fieldset id="weapons">
             <label><input type="radio" class="radio-button" value="Rope" name="weapons"></input>Rope</label>

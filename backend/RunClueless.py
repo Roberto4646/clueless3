@@ -152,11 +152,31 @@ def handle_turn_action(data):
                 emit("NOTIFICATION", ["User " + str(pid) + " has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
             else:
                 emit("REQUEST_PROOF", suggestion, to=nextPlayerToDisprove)
-        else:                   # player is making a suggestion, params = ["Suspect", "Room", "Weapon"]
-            nextPlayerToDisprove = game.processSuggestion(pid, params[0], params[1], params[2])
-            emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
-            emit("NOTIFICATION", ["User " + str(pid) + " suggests "+params[0]+" committed the crime in the "+params[1]+" with the "+params[2]], to=gid)
-            emit("REQUEST_PROOF", params, to=nextPlayerToDisprove)
+        elif len(params) == 2:                   # player is making a suggestion, params = ["Suspect", "Weapon"]. Room = current room
+            # suggestion is valid in game (positions, etc)
+            suspect, weapon = params
+            valid, details = game.suggestionValid(pid, suspect, weapon)
+            # if valid, do suggestion stuff
+            if valid: 
+                room = details
+
+                nextPidToDisprove = game.processSuggestion(pid, suspect, room, weapon)
+                # emit("PLAYER_ACTIONS", [game.getTurnActions(pid)]) # not sure what this was supposed to do
+
+                emit("NOTIFICATION", ["User " + str(pid) + " suggests "
+                                      + suspect +" committed the crime in the "+ room +" with the "+ weapon + 
+                                      ". " + suspect + " has been moved to " + room], to=gid)
+                emit("GAME_BOARD", game.getBoard(), to=gid) 
+
+                emit("REQUEST_PROOF", params, to=nextPidToDisprove)
+                print(game.getCharacterForPlayer(nextPidToDisprove) + "'s turn to disprove") #DELETE
+
+            # else, do failed suggestion stuff
+            else: 
+                emit("NOTIFICATION", [details], to=pid)
+
+        else: 
+            emit("NOTIFICATION", ["Invalid Suggestion -- wrong number of parameters"], to=pid)
 
 
     elif action == "ACCUSE":
