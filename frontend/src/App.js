@@ -141,6 +141,8 @@ function App() {
     } else {
       socket.emit("TURN_ACTION", ["SUGGEST", ""]);
     }
+    
+    setSuggestion([]);
   }
 
   // HTML Rendering --------------------------------------------------
@@ -182,23 +184,25 @@ function App() {
     console.log("Hand: ", hand);
 
     const commonItems = hand.filter(item => suggestion.includes(item));
+    if (suggestion.length > 0) {
+      return (
+        <div>
+          <button className="button-modern" onClick={() => disprove()}>Disprove</button>
+          <form>
+            <label htmlFor="proof">Proof:</label>
+            <select id="proof" name="proof" style={{ whiteSpace: 'pre-wrap' }}>  {/* Added inline style */}
+              <option value="" selected disabled hidden>Choose Proof</option>
+              {commonItems.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </form>
+        </div>
+      );
+    }
     
-    return (
-      <div>
-        <button className="button-modern" onClick={() => accuse()}>Disprove</button>
-        <form>
-          <label htmlFor="proof">Proof:</label>
-          <select id="proof" name="proof" style={{ whiteSpace: 'pre-wrap' }}>  {/* Added inline style */}
-            <option value="" selected disabled hidden>Choose Proof</option>
-            {commonItems.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </form>
-      </div>
-    );
   }
 
   const renderMoveChoice = (data) => {
