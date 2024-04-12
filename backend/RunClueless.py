@@ -152,12 +152,15 @@ def handle_turn_action(data):
     elif action == "SUGGEST":
         # TODO: suggest
         if len(params) == 1:    # player is disproving, params = ["<The proof>"]
-            success, nextPlayerToDisprove, suggester, suggestion = game.disproveSuggestion(pid, params[0])
+            success, nextPidToDisprove, suggester, suggestion = game.disproveSuggestion(pid, params[0])
             if success:
-                emit("NOTIFICATION", ["User " + str(nextPlayerToDisprove) + " has disproved the suggestion!"], to=gid)
-                emit("NOTIFICATION", ["User " + str(pid) + " has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has disproved the suggestion!"], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
+            elif nextPidToDisprove != suggester:
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " could not disprove the suggestion! " + game.getCharacterForPlayer(nextPidToDisprove) + " is next!"], to=gid)
+                emit("REQUEST_PROOF", list(suggestion), to=nextPidToDisprove)
             else:
-                emit("REQUEST_PROOF", suggestion, to=nextPlayerToDisprove)
+                emit("NOTIFICATION", ["No one could disprove the suggestion!"], to=gid)
         elif len(params) == 2:                   # player is making a suggestion, params = ["Suspect", "Weapon"]. Room = current room
             # suggestion is valid in game (positions, etc)
             suspect, weapon = params

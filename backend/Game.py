@@ -26,7 +26,7 @@ class Game:
         self.playerToCharacter = {}
         self.currentTurn = 0 # whose turn = playerIds[currentTurn]
 
-        self.suggestionTracker = (None, None) # (playerId, (suspect, room, weapon), nextPlayerToDisprove)
+        self.suggestionTracker = [None, None, -1] # (playerId, (suspect, room, weapon), nextTurnIndex)
 
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
@@ -147,7 +147,7 @@ class Game:
         return self.playerIds
 
     def checkPlayerTurnValid(self, playerId):
-        return playerId == self.playerIds[self.currentTurn]
+        return playerId == self.playerIds[self.currentTurn] or self.playerIds.index(playerId) == self.suggestionTracker[2]
 
     def getTurnActions(self, playerId):
         character = self.playerToCharacter[playerId] # TODO: check playerid is in here
@@ -212,8 +212,9 @@ class Game:
         # TODO: track the player who made the suggestion
         # TODO: track the suggestion
         # TODO: track the next player to request proof, starts "left" clockwise 
-        nextPidToDisprove = self.playerIds[(self.currentTurn + 1)%len(self.playerIds)]
-        self.suggestionTracker = (playerId, (Suspects(suspect), Rooms(room), Weapons(weapon)), nextPidToDisprove)  
+        nextTurnIndex = (self.currentTurn + 1)%len(self.playerIds)
+        nextPidToDisprove = self.playerIds[nextTurnIndex]
+        self.suggestionTracker = [playerId, (suspect, room, weapon), nextTurnIndex]
 
         # move suspect to room 
         suspect_character = self._getCharacterByName(suspect)
@@ -226,15 +227,28 @@ class Game:
     
     def disproveSuggestion(self, playerId, proof):
         success = False
-        nextPlayerToDisprove = -1
-        suggester = -1
-        suggestion = []
+        nextPidToDisprove = -1
+        suggester = self.suggestionTracker[0]
+        suggestion = self.suggestionTracker[1]
+        print(proof)
+        print(self.suggestionTracker)
         # TODO: validate player to disprove
-        # TODO: validate proof with player
-        # TODO: validate proof to suggestion
-        # TODO: iterate to next player if cannot disprove
-        # TODO: end disprove tracking if can disprove
-        return success, nextPlayerToDisprove, suggester, suggestion
+        if (playerId == self.playerIds[self.suggestionTracker[2]]):
+            character = self.playerToCharacter[playerId]
+            # TODO: validate proof with player
+            # TODO: validate proof to suggestion
+            print(character.getHandCards())
+            print(proof in character.getHandCards())
+            print(proof in self.suggestionTracker[1])
+            if (proof in character.getHandCards() and proof in self.suggestionTracker[1]):
+                success = True
+                
+        self.suggestionTracker[2] = (self.suggestionTracker[2] + 1)%len(self.playerIds)
+        nextPidToDisprove = self.playerIds[self.suggestionTracker[2]]
+        print(success)
+        print(self.suggestionTracker)
+
+        return success, nextPidToDisprove, suggester, suggestion
 
     def processAccusation(self, playerId, suspect, room, weapon):
         character = self.playerToCharacter[playerId]
