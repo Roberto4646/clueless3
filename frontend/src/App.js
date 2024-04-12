@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GameLobbyPage from './components/GameLobbyPage';
 import CreateLobbyPage from './components/CreateLobbyPage';
 import MainGamePage from './components/MainGamePage';
+import JoinLobbyPage from './components/JoinLobbyPage';
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -104,56 +105,42 @@ function App() {
   }
 
   const suggest = () => {
-    // TODO: Send form input in the TURN_ACTION message
-    var suspect, weapon
-    var suspectRadios = document.getElementsByName("suspects");
-    var weaponRadios = document.getElementsByName("weapons");
-    for(var i = 0; i < suspectRadios.length; i++) {
-        if(suspectRadios[i].checked) {
-          suspect = suspectRadios[i].value;
-          console.log(suspectRadios[i].value);
-          break;
-        }
+    var suspectE = document.getElementById("suggestSuspects");
+    var weaponE = document.getElementById("suggestWeapons");
+    var suspect = suspectE.options[suspectE.selectedIndex].text;
+    var weapon = weaponE.options[weaponE.selectedIndex].text;
+
+    if (suspect && weapon){
+      socket.emit("TURN_ACTION", ["SUGGEST", suspect, weapon]);
+    } else{
+      console.log("Please select both")
     }
-    for(i = 0; i < weaponRadios.length; i++) {
-      if(weaponRadios[i].checked) {
-        weapon = weaponRadios[i].value;
-        console.log(weaponRadios[i].value);
-        break;
-      }
-    }
-    
-    socket.emit("TURN_ACTION", ["SUGGEST", suspect, weapon]);
   }
 
   const accuse = () => {
-    var suspect, room, weapon
-    var suspectRadios = document.getElementsByName("suspects");
-    var roomRadios = document.getElementsByName("room");
-    var weaponRadios = document.getElementsByName("weapons");
-    for(var i = 0; i < suspectRadios.length; i++) {
-        if(suspectRadios[i].checked) {
-          suspect = suspectRadios[i].value;
-          console.log(suspectRadios[i].value);
-          break;
-        }
-    }
-    for(i = 0; i < weaponRadios.length; i++) {
-      if(weaponRadios[i].checked) {
-        weapon = weaponRadios[i].value;
-        console.log(weaponRadios[i].value);
-        break;
-      }
-    }
-    for(i = 0; i < roomRadios.length; i++) {
-      if(roomRadios[i].checked) {
-        room = roomRadios[i].value;
-        console.log(roomRadios[i].value);
-        break;
-      }
-    }
+    var suspectE = document.getElementById("accuseSuspects");
+    var roomE = document.getElementById("accuseRoom");
+    var weaponE = document.getElementById("accuseWeapons");
+    var suspect = suspectE.options[suspectE.selectedIndex].text;
+    var room = roomE.options[roomE.selectedIndex].text;
+    var weapon = weaponE.options[weaponE.selectedIndex].text;
     
-    socket.emit("TURN_ACTION", ["ACCUSE", suspect, room, weapon]);
+    if (suspect && weapon && room){
+      socket.emit("TURN_ACTION", ["ACCUSE", suspect, room, weapon]);
+    } else{
+      console.log("Please select both")
+    }
+  }
+
+  const disprove = () => {
+    var proofE = document.getElementById("proof");
+    var proof = proofE.options[proofE.selectedIndex].text;
+
+    if (proof) {
+      socket.emit("TURN_ACTION", ["SUGGEST", proof]);
+    } else {
+      socket.emit("TURN_ACTION", ["SUGGEST", ""]);
+    }
   }
 
   // HTML Rendering --------------------------------------------------
@@ -170,7 +157,6 @@ function App() {
   }
   
   const renderBoard = () => {
-    console.log(board)
     var output = ""
     
     for(var i = 0; i < board.length; i++) {
@@ -191,8 +177,28 @@ function App() {
     return output;
     // {output}
   }
-  const renderSuggestion = () => {
-    return suggestion.join();
+  const renderDisprove = () => {
+    console.log(suggestion);
+    console.log("Hand: ", hand);
+
+    const commonItems = hand.filter(item => suggestion.includes(item));
+    
+    return (
+      <div>
+        <button className="button-modern" onClick={() => accuse()}>Disprove</button>
+        <form>
+          <label htmlFor="proof">Proof:</label>
+          <select id="proof" name="proof" style={{ whiteSpace: 'pre-wrap' }}>  {/* Added inline style */}
+            <option value="" selected disabled hidden>Choose Proof</option>
+            {commonItems.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </form>
+      </div>
+    );
   }
 
   const renderMoveChoice = (data) => {
@@ -200,45 +206,83 @@ function App() {
       <button className="button-modern" onClick={() => socket.emit("TURN_ACTION", ["MOVE", data])}> {data} </button>
     )
   }
-
+  
   const renderAccusation = () => {
     return (
       <div>
         <button className="button-modern" onClick={() => accuse()}>Make Accusation</button>
-        {<form>
-          <fieldset id="suspects">
-            <label><input type="radio" class="radio-button" value="Colonel Mustard" name="suspects"></input>Colonel Mustard</label>
-            <label><input type="radio" class="radio-button" value="Miss Scarlet" name="suspects"></input>Miss Scarlet</label>
-            <label><input type="radio" class="radio-button" value="Professor Plum" name="suspects"></input>Professor Plum</label>
-            <label><input type="radio" class="radio-button" value="Mr. Green" name="suspects"></input>Mr.Green</label>
-            <label><input type="radio" class="radio-button" value="Mrs. White" name="suspects"></input>Mrs.White</label>
-            <label><input type="radio" class="radio-button" value="Mrs. Peacock" name="suspects"></input>Mrs.Peacock</label>
-          </fieldset>
-          <fieldset id="weapons">
-            <label><input type="radio" class="radio-button" value="Rope" name="weapons"></input>Rope</label>
-            <label><input type="radio" class="radio-button" value="Lead Pipe" name="weapons"></input>Lead Pipe</label>
-            <label><input type="radio" class="radio-button" value="Knife" name="weapons"></input>Knife</label>
-            <label><input type="radio" class="radio-button" value="Wrench" name="weapons"></input>Wrench</label>
-            <label><input type="radio" class="radio-button" value="Candlestick" name="weapons"></input>Candlestick</label>
-            <label><input type="radio" class="radio-button" value="Revolver" name="weapons"></input>Revolver</label>
-          </fieldset>
-          <fieldset id="room">
-            <label><input type="radio" class="radio-button" value="Study" name="room"></input>Study</label>
-            <label><input type="radio" class="radio-button" value="Hall" name="room"></input>Hall</label>
-            <label><input type="radio" class="radio-button" value="Lounge" name="room"></input>Lounge</label>
-            <label><input type="radio" class="radio-button" value="Library" name="room"></input>Library</label>
-            <label><input type="radio" class="radio-button" value="Billiard Room" name="room"></input>Billiard Room</label>
-            <label><input type="radio" class="radio-button" value="Dining Room" name="room"></input>Dining Room</label>
-            <label><input type="radio" class="radio-button" value="Conservatory" name="room"></input>Conservatory</label>
-            <label><input type="radio" class="radio-button" value="Ballroom" name="room"></input>Ballroom</label>
-            <label><input type="radio" class="radio-button" value="Kitchen" name="room"></input>Kitchen</label>
-          </fieldset>
-        </form>}
+        <form>
+          <label htmlFor="accuseSuspects">Suspect:</label>
+          <select id="accuseSuspects" name="accuseSuspects">
+            <option value="" selected disabled hidden></option>
+            <option value="Colonel Mustard">Colonel Mustard</option>
+            <option value="Miss Scarlet">Miss Scarlet</option>
+            <option value="Professor Plum">Professor Plum</option>
+            <option value="Mr. Green">Mr. Green</option>
+            <option value="Mrs. White">Mrs. White</option>
+            <option value="Mrs. Peacock">Mrs. Peacock</option>
+          </select>
+  
+          <label style={{ marginLeft: '7px' }} htmlFor="accuseWeapons">Weapon:</label>
+          <select id="accuseWeapons" name="accuseWeapons">
+            <option value="" selected disabled hidden></option>
+            <option value="Rope">Rope</option>
+            <option value="Lead Pipe">Lead Pipe</option>
+            <option value="Knife">Knife</option>
+            <option value="Wrench">Wrench</option>
+            <option value="Candlestick">Candlestick</option>
+            <option value="Revolver">Revolver</option>
+          </select>
+  
+          <label style={{ marginLeft: '7px' }} htmlFor="accuseRoom">Room:</label>
+          <select id="accuseRoom" name="accuseRoom">
+            <option value="" selected disabled hidden></option>
+            <option value="Study">Study</option>
+            <option value="Hall">Hall</option>
+            <option value="Lounge">Lounge</option>
+            <option value="Library">Library</option>
+            <option value="Billiard Room">Billiard Room</option>
+            <option value="Dining Room">Dining Room</option>
+            <option value="Conservatory">Conservatory</option>
+            <option value="Ballroom">Ballroom</option>
+            <option value="Kitchen">Kitchen</option>
+          </select>
+        </form>
       </div>
-      
-    )
-  }
+    );
+  };
 
+  const renderSuggestion = () => {
+    return (
+      <div>
+        <button className="button-modern" onClick={() => suggest()}>Make Suggestion</button>
+        <form>
+          <label htmlFor="suggestSuspects">Suspect:</label>
+          <select id="suggestSuspects" name="suggestSuspects">
+            <option value="" selected disabled hidden></option>
+            <option value="Colonel Mustard">Colonel Mustard</option>
+            <option value="Miss Scarlet">Miss Scarlet</option>
+            <option value="Professor Plum">Professor Plum</option>
+            <option value="Mr. Green">Mr. Green</option>
+            <option value="Mrs. White">Mrs. White</option>
+            <option value="Mrs. Peacock">Mrs. Peacock</option>
+          </select>
+  
+          <label style={{ marginLeft: '7px' }} htmlFor="suggestWeapons">Weapon:</label>
+          <select id="suggestWeapons" name="suggestWeapons">
+            <option value="" selected disabled hidden></option>
+            <option value="Rope">Rope</option>
+            <option value="Lead Pipe">Lead Pipe</option>
+            <option value="Knife">Knife</option>
+            <option value="Wrench">Wrench</option>
+            <option value="Candlestick">Candlestick</option>
+            <option value="Revolver">Revolver</option>
+          </select> 
+        </form>
+      </div>
+    );
+  };
+  
   return (
     <Router>
         <Routes>
@@ -252,6 +296,13 @@ function App() {
             onStartGame={startGame}
             pid={pid} 
             gid={gid}
+            renderLobbyList={renderLobbyList}
+          />} />
+          <Route path="/join-lobby" element={<JoinLobbyPage 
+            pid={pid} 
+            gid={gid}
+            charName={charName}
+            renderLobbyList={renderLobbyList}
           />} />
           <Route path="/main-game" element={<MainGamePage
               startGame={startGame}
@@ -261,6 +312,14 @@ function App() {
               moveChoices={moveChoices}
               renderMoveChoice={renderMoveChoice}
               endTurn={endTurn}
+              renderHand={renderHand}
+              notifBanner={notifBanner}
+              renderLobbyList={renderLobbyList}
+              turnCurr={turnCurr}
+              renderBoard={renderBoard}
+              renderSuggestion={renderSuggestion}
+              renderDisprove={renderDisprove}
+              charName={charName}
             />} />
         </Routes>
     </Router>
@@ -268,3 +327,18 @@ function App() {
 }
 
 export default App;
+/*
+<div> Player Hand: {renderHand()} </div>
+<div> Turn Order: {renderTurnOrder()} </div>
+<div> Disprove this Suggestion: {renderSuggestion()} </div> 
+</div>
+<div className="right-box">
+<header class="box-header">
+  Dynamic Info
+</header>
+<div> Current Notification : {notifBanner} </div>
+<div> Available Actions: {renderActions()} </div>
+<div> Current Turn: {turnCurr} </div>
+<div> Lobby Members: <pre>{renderLobbyList()}</pre></div>
+<div> Board: <pre>{renderBoard()}</pre> </div>
+*/

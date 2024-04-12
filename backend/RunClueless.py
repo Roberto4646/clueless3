@@ -102,7 +102,7 @@ def handle_game_start(gid):
     # tell each player their character and hand
     for pid in game.getPlayerIds():
         emit("PLAYER_WHOAMI", [game.getCharacterForPlayer(pid)], to=pid)
-        emit("PLAYER_HAND", [game.getHandForPlayer(pid)], to=pid)
+        emit("PLAYER_HAND", game.getHandForPlayer(pid), to=pid)
     
     # send game board, turn order, and current turn to all players
     currentPlayer, currentCharacter = game.getCurrentTurn()
@@ -169,12 +169,12 @@ def handle_turn_action(data):
                 nextPidToDisprove = game.processSuggestion(pid, suspect, room, weapon)
                 # emit("PLAYER_ACTIONS", [game.getTurnActions(pid)]) # not sure what this was supposed to do
 
-                emit("NOTIFICATION", ["User " + str(pid) + " suggests "
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " suggests "
                                       + suspect +" committed the crime in the "+ room +" with the "+ weapon + 
                                       ". " + suspect + " has been moved to " + room], to=gid)
                 emit("GAME_BOARD", game.getBoard(), to=gid) 
 
-                emit("REQUEST_PROOF", params, to=nextPidToDisprove)
+                emit("REQUEST_PROOF", [suspect, weapon, room], to=nextPidToDisprove)
                 print(game.getCharacterForPlayer(nextPidToDisprove) + "'s turn to disprove") #DELETE
 
             # else, do failed suggestion stuff
