@@ -165,9 +165,9 @@ class Game:
             canSuggest = not character.hasSuggested
 
             # if player has not made an accusation this game
-            canSuggest = not character.hasAccused
+            canAccuse = not character.hasAccused
 
-        return canMove, canSuggest, canAccuse
+        return [canMove, canSuggest, canAccuse]
 
     def startMove(self, playerId):
         character = self.playerToCharacter[playerId]
@@ -192,10 +192,9 @@ class Game:
     def endTurn(self, playerId):
         #reset the hasMoved/hasSuggested but not hasAccused
         character = self.playerToCharacter[playerId]
-        if(character.hasMoved):
+        if (not character.hasAccused) : 
             character.hasMoved = False
-        if(character.hasSuggested):
-            character.hasMoved = False     
+            character.hasSuggested = False     
         #Update to the next player
         self.currentTurn = (self.currentTurn + 1) % len(self.playerIds)
         return self.playerIds[self.currentTurn] #next player

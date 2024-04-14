@@ -111,7 +111,7 @@ def handle_game_start(gid):
     emit("GAME_BOARD", game.getBoard(), to=gid) 
 
     # send starting player their available turn actions
-    emit("PLAYER_ACTIONS", [game.getTurnActions(currentPlayer)], to=currentPlayer)
+    emit("PLAYER_ACTIONS", game.getTurnActions(currentPlayer), to=currentPlayer)
     printState()
 
 @socketio.on('TURN_ACTION')
@@ -132,11 +132,12 @@ def handle_turn_action(data):
         return
     if action == "END_TURN":
         nextPlayerId = game.endTurn(pid)
-        emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
+        emit("PLAYER_ACTIONS", game.getTurnActions(pid), to=pid)
+        emit("MOVE_CHOICES", [])
         emit("NOTIFICATION", ["User " + str(pid) + " has ended their turn and User " + str(nextPlayerId) + " is up next."], to=gid)        
         currentPlayer, currentCharacter = game.getCurrentTurn()
         emit("TURN_CURRENT", [currentCharacter], to=gid)
-        emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
+        emit("PLAYER_ACTIONS", game.getTurnActions(nextPlayerId), to=nextPlayerId)
     elif action == "MOVE":
         if len(params) == 0:    # player chose to move
             emit("MOVE_CHOICES", game.startMove(pid))
@@ -144,7 +145,7 @@ def handle_turn_action(data):
             success = game.move(pid, params[0])
             if success:
                 emit("MOVE_CHOICES", [])
-                emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
+                emit("PLAYER_ACTIONS", game.getTurnActions(pid))
                 emit("NOTIFICATION", ["User " + str(pid) + " has moved to "+params[0]+"."], to=gid)
                 emit("GAME_BOARD", game.getBoard(), to=gid)
             else:
@@ -170,8 +171,8 @@ def handle_turn_action(data):
                 room = details
 
                 nextPidToDisprove = game.processSuggestion(pid, suspect, room, weapon)
-                # emit("PLAYER_ACTIONS", [game.getTurnActions(pid)]) # not sure what this was supposed to do
 
+                emit("PLAYER_ACTIONS", game.getTurnActions(pid))
                 emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " suggests "
                                       + suspect +" committed the crime in the "+ room +" with the "+ weapon + 
                                       ". " + suspect + " has been moved to " + room], to=gid)
@@ -191,13 +192,13 @@ def handle_turn_action(data):
     elif action == "ACCUSE":
         success = game.processAccusation(pid, params[0], params[1], params[2])
         
-        emit("NOTIFICATION", ["The solution is "+str(game.solution)+"."])
-        emit("PLAYER_ACTIONS", [game.getTurnActions(pid)])
+        emit("PLAYER_ACTIONS", game.getTurnActions(pid), to=pid)
 
         if success:
-            emit("NOTIFICATION", ["User " + str(pid) + " has solved the mystery!"], to=gid)
+            emit("NOTIFICATION", ["User " + str(pid) + " has solved the mystery! The solution is "+str(game.solution)+"."], to=gid)
         else:
             emit("NOTIFICATION", ["User " + str(pid) + " made a wrong accusation!"], to=gid)
+            emit("NOTIFICATION", ["You accused incorrectly! The solution is "+str(game.solution)+"."])
 
         return
     
