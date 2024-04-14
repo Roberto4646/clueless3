@@ -180,10 +180,8 @@ function App() {
     // {output}
   }
   const renderDisprove = () => {
-    console.log(suggestion);
-    console.log("Hand: ", hand);
-
     const commonItems = hand.filter(item => suggestion.includes(item));
+
     if (suggestion.length > 0) {
       return (
         <div>
@@ -212,6 +210,14 @@ function App() {
   }
   
   const renderAccusation = () => {
+    if (turnCurr !== charName || !actions[2]) {
+      return (
+        <div>
+          <button className="button-modern" disabled>Make Accusation</button>
+        </div>
+      );
+    }
+
     return (
       <div>
         <button className="button-modern" onClick={() => accuse()}>Make Accusation</button>
@@ -257,6 +263,14 @@ function App() {
   };
 
   const renderSuggestion = () => {
+    if (turnCurr !== charName || !actions[1]) {
+      return (
+        <div>
+          <button className="button-modern" disabled>Make Suggestion</button>
+        </div>
+      );
+    }
+
     return (
       <div>
         <button className="button-modern" onClick={() => suggest()}>Make Suggestion</button>
@@ -310,7 +324,6 @@ function App() {
           />} />
           <Route path="/main-game" element={<MainGamePage
               startGame={startGame}
-              suggest={suggest}
               renderAccusation={renderAccusation}
               move={move}
               moveChoices={moveChoices}
@@ -324,6 +337,7 @@ function App() {
               renderSuggestion={renderSuggestion}
               renderDisprove={renderDisprove}
               charName={charName}
+              actions={actions}
             />} />
         </Routes>
     </Router>
