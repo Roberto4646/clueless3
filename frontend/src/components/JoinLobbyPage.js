@@ -3,19 +3,15 @@ import '../App.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList}) {
+function JoinLobbyPage({ pid, gid, charName, renderLobbyList}) {
   const navigate = useNavigate();
-
-  const handleStartGame = () => {
-    onStartGame();
-    navigate('/main-game'); // Navigate to MainGamePage after starting the game
-  }
-
   React.useEffect(() => {
-    console.log(pid); // Ensure that pid is updated
-
+    if (charName !== ""){
+        navigate('/main-game');
+    } 
     // Add other useEffect dependencies as needed
-  }, [pid]);
+  }, [charName]);
+
     return (
       <div className="App">
         <header className="header">
@@ -29,7 +25,6 @@ function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList}) {
             {pid !== -1 && <div>Lobby Code: {gid}</div>}
             {pid !== -1 && <div>Player ID: {pid}</div>}
             <div> Lobby Members: <pre>{renderLobbyList()}</pre></div>
-            <div><button className="button-modern" onClick={handleStartGame}>Start Game</button></div>
             <div><Link className="button-modern" to="/">Back to MainMenu</Link></div>
           </div>
         </div>
@@ -38,4 +33,4 @@ function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList}) {
   }
   
 
-export default GameLobbyPage;
+export default JoinLobbyPage;

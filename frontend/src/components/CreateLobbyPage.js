@@ -13,7 +13,7 @@ function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput }) 
 
   const handleJoinLobby = () => {
     onJoinLobby();
-    navigate('/game-lobby'); // Navigate to GameLobbyPage after creating lobby
+    navigate('/join-lobby'); // Navigate to GameLobbyPage after creating lobby
   }
     return (
       <div className="App">

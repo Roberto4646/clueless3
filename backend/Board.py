@@ -8,15 +8,15 @@ class Board:
     def __init__(self):
         self.weaponLocations = {}
         self.board = {
-            Rooms.STUDY: [Hallways.STUDY_HALL, Hallways.LIBRARY_STUDY],
+            Rooms.STUDY: [Hallways.STUDY_HALL, Hallways.LIBRARY_STUDY, Rooms.KITCHEN],
             Rooms.HALL: [Hallways.STUDY_HALL, Hallways.HALL_LOUNGE, Hallways.HALL_BILLIARD],
-            Rooms.LOUNGE: [Hallways.HALL_LOUNGE, Hallways.LOUNGE_DINING],
+            Rooms.LOUNGE: [Hallways.HALL_LOUNGE, Hallways.LOUNGE_DINING, Rooms.CONSERVATORY],
             Rooms.LIBRARY: [Hallways.LIBRARY_STUDY, Hallways.CONSERVATORY_LIBRARY],
             Rooms.BILLIARD: [Hallways.HALL_BILLIARD, Hallways.DINING_BILLIARD, Hallways.BALLROOM_BILLIARD, Hallways.LIBRARY_BILLIARD],
             Rooms.DINING: [Hallways.LOUNGE_DINING, Hallways.DINING_KITCHEN, Hallways.DINING_BILLIARD],
-            Rooms.CONSERVATORY: [Hallways.BALLROOM_CONSERVATORY, Hallways.CONSERVATORY_LIBRARY],
+            Rooms.CONSERVATORY: [Hallways.BALLROOM_CONSERVATORY, Hallways.CONSERVATORY_LIBRARY, Rooms.LOUNGE],
             Rooms.BALLROOM: [Hallways.KITCHEN_BALLROOM, Hallways.BALLROOM_CONSERVATORY, Hallways.BALLROOM_BILLIARD],
-            Rooms.KITCHEN: [Hallways.KITCHEN_BALLROOM, Hallways.DINING_KITCHEN],
+            Rooms.KITCHEN: [Hallways.KITCHEN_BALLROOM, Hallways.DINING_KITCHEN, Rooms.STUDY],
             Hallways.STUDY_HALL: [Rooms.STUDY, Rooms.HALL],
             Hallways.HALL_LOUNGE: [Rooms.HALL, Rooms.LOUNGE],
             Hallways.LOUNGE_DINING: [Rooms.LOUNGE, Rooms.DINING],
