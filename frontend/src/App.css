@@ -1,3 +1,13 @@
+/* setting default font just cause */
+* { 
+  font-family: 'roboto_condensedregular';
+}
+
+#root {
+  height: 100vh;
+}
+
+
 .App {
   background: linear-gradient(to right, hsl(224, 61%, 45%), #0e4ea1);
   height: 100vh;
@@ -15,6 +25,15 @@
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
+}
+
+@font-face {
+  font-family: 'roboto_condensedregular';
+  src: url('fonts/robotocondensed-regular-webfont.woff2') format('woff2'),
+       url('fonts/robotocondensed-regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
 }
 
 .App-header {
@@ -138,4 +157,69 @@ button[disabled]{
   background-image: none;
   background-color: #cccccc;
   color: #666666;
+}
+
+.split-screen {
+  width: 100%;
+  height: 100%;
+  display: table;
+}
+
+.main-screen {
+  background-color: #2951B6;
+  width: 71.5%;
+  height: 100%;
+  display: table-cell
+}
+.center {
+  text-align: center;
+}
+
+.clueless_logo {
+  width: 30%;
+}
+
+.chatbox {
+  background-color: #70B1FF;
+  padding: 10px;
+  display: table-cell;
+}
+
+.chatlog {
+  height: 80vh;
+  overflow-y: scroll;
+}
+
+.button-custom {
+  width: 200px;
+  height: 40px;
+  background: #002358;
+  border-radius: 15px;
+  color: #fff;
+  border-style: none;
+  margin: 6px;
+  font-size: 18px;
+  /* Rectangle 4 */
+  text-align: center;
+  /* vertical-align:middle; */
+}
+
+.extra-right-margin {
+  margin-right: 20px;
+}
+
+.text-entry {
+  background-color: #DCEAFF;
+  border-radius: 15px;
+  border-style: none;
+  width: 200px;
+  height: 40px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.link {
+  color: #FFF;
+  vertical-align: -webkit-baseline-middle;
+  text-decoration: none;
 }

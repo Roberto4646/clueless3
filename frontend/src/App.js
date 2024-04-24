@@ -9,6 +9,10 @@ import GameLobbyPage from './components/GameLobbyPage';
 import CreateLobbyPage from './components/CreateLobbyPage';
 import MainGamePage from './components/MainGamePage';
 import JoinLobbyPage from './components/JoinLobbyPage';
+import NotificationChatbox from './components/NotificationChatbox';
+
+import clueless_logo from './clueless_logo.png';
+
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -27,11 +31,22 @@ function App() {
   const [suggestion, setSuggestion] = useState([]); // just temp for skeletal
   const [moveChoices, setMoveChoices] = useState([]); // just temp for skeletal
 
+  const initial_chatLog = {timestamp: (new Date()).toLocaleTimeString(), message: "This is where game notifications appear"};
+  let [chatLog, setChatLog] = useState([]);
+
+  const addToChatLog = (notif) => {
+    setChatLog((prevChatLog) => {
+      const new_entry = { timestamp: new Date().toLocaleTimeString(), message: notif };
+      console.log("adding " + new_entry.message);
+      console.log("orig len " + prevChatLog.length);
+      return [...prevChatLog, new_entry];
+    });
+  };
   
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
-  }, []);
+  }, [chatLog]);
 
   // Set up listeners
   useEffect(() => {
@@ -39,6 +54,8 @@ function App() {
       socket.on('NOTIFICATION', function (data) {
         console.log(data[0])
         setNotifBanner(data[0]);
+
+        addToChatLog(data[0]);
 
         if (data[0] == 'GAME STARTED') {
           setGameStatus('IN PROGRESS');
@@ -176,14 +193,8 @@ function App() {
   }
 
   const renderLobbyList = () => {
-    var output = ""
-
-    for(var i = 0; i < lobbyList.length; i++) {
-      //<char> is in <location> 
-      output += lobbyList[i] + "\n";
-    }
-    return output;
-    // {output}
+    return lobbyList.map((entry) =>
+      <div key={entry}>{entry}</div>)
   }
   const renderDisprove = () => {
     const commonItems = hand.filter(item => suggestion.includes(item));
@@ -308,30 +319,35 @@ function App() {
   };
   
   return (
-    <Router>
-        <Routes>
-          <Route path="/" element={<CreateLobbyPage
+    <div className='split-screen'>
+      <div className='main-screen'>
+        <div className='center'>
+        <img src={clueless_logo} alt="Clue-less logo" className='clueless_logo'/>
+        </div>
+        <Router >
+          <Routes>
+            <Route path="/" element={<CreateLobbyPage
               onCreateLobby={createLobby}
               onJoinLobby={joinLobby}
               gidInput={gidInput}
-              setGIDInput={setGIDInput} 
+              setGIDInput={setGIDInput}
               gameStatus={gameStatus}
-              />} />
-          <Route path="/game-lobby" element={<GameLobbyPage 
-            onStartGame={startGame}
-            pid={pid} 
-            gid={gid}
-            renderLobbyList={renderLobbyList}
-            gameStatus={gameStatus}
-          />} />
-          <Route path="/join-lobby" element={<JoinLobbyPage 
+            />} />
+            <Route path="/game-lobby" element={<GameLobbyPage
+              onStartGame={startGame}
+              pid={pid}
+              gid={gid}
+              renderLobbyList={renderLobbyList}
+              gameStatus={gameStatus}
+            />} />
+            {/* <Route path="/join-lobby" element={<JoinLobbyPage 
             pid={pid} 
             gid={gid}
             charName={charName}
             renderLobbyList={renderLobbyList}
             gameStatus={gameStatus}
-          />} />
-          <Route path="/main-game" element={<MainGamePage
+          />} /> */}
+            <Route path="/main-game" element={<MainGamePage
               startGame={startGame}
               renderAccusation={renderAccusation}
               move={move}
@@ -348,8 +364,14 @@ function App() {
               charName={charName}
               actions={actions}
             />} />
-        </Routes>
-    </Router>
+          </Routes>
+        </Router>
+      </div>
+      <div className='chatbox'>
+        <NotificationChatbox notifications={chatLog} />
+
+      </div>
+    </div>
   );
 }
 

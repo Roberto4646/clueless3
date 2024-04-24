@@ -2,6 +2,7 @@ import React from 'react';
 import '../App.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import NotificationChatbox from './NotificationChatbox';
 
 function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput }) {
   const navigate = useNavigate();
@@ -13,26 +14,19 @@ function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput }) 
 
   const handleJoinLobby = () => {
     onJoinLobby();
-    navigate('/join-lobby'); // Navigate to GameLobbyPage after creating lobby
+    navigate('/game-lobby'); // Navigate to GameLobbyPage after creating lobby
   }
     return (
-      <div className="App">
-        <header className="header">
-          Clue-less
-        </header>
-        <div className="left-box">
-          <header className="box-header">
-            Options
-          </header>
-          <div className="button-column">
-            <div><button className="button-modern" onClick={handleCreateLobby}>Create Lobby</button></div>
-            <div>
-              <button className="button-modern" onClick={handleJoinLobby}>Join Lobby</button>
-              <input type="text" className="input-modern" value={gidInput} onChange={e => setGIDInput(e.target.value)} />
-            </div>
-          </div>
+
+      <div>
+        <div style={{color: "#fff"}}>
+          <button className="button-custom extra-right-margin" onClick={handleCreateLobby}>Create Lobby</button>
+          generate a lobby code for your friends
         </div>
+        <button className="button-custom extra-right-margin" onClick={handleJoinLobby}>Join Lobby</button>
+          <input type="text" className="text-entry" value={gidInput} onChange={e => setGIDInput(e.target.value)} />
       </div>
+
     );
   }
 
