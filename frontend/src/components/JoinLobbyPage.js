@@ -3,14 +3,14 @@ import '../App.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function JoinLobbyPage({ pid, gid, charName, renderLobbyList}) {
+function JoinLobbyPage({ pid, gid, charName, renderLobbyList, gameStatus}) {
   const navigate = useNavigate();
   React.useEffect(() => {
-    if (charName !== ""){
+    if (gameStatus == "IN PROGRESS"){
         navigate('/main-game');
     } 
     // Add other useEffect dependencies as needed
-  }, [charName]);
+  }, [gameStatus]);
 
     return (
       <div className="App">

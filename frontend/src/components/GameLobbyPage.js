@@ -3,19 +3,24 @@ import '../App.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList}) {
+function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList, gameStatus}) {
   const navigate = useNavigate();
 
   const handleStartGame = () => {
     onStartGame();
-    navigate('/main-game'); // Navigate to MainGamePage after starting the game
+
+    // if (gameStatus == "IN PROGRESS") {
+    //   navigate('/main-game'); // Navigate to MainGamePage after starting the game
+    // }
   }
 
   React.useEffect(() => {
     console.log(pid); // Ensure that pid is updated
-
+    if (gameStatus == "IN PROGRESS"){
+      navigate('/main-game');
+    } 
     // Add other useEffect dependencies as needed
-  }, [pid]);
+  }, [pid, gameStatus]);
     return (
       <div className="App">
         <header className="header">

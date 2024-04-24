@@ -33,6 +33,9 @@ class Game:
     def addPlayer(self, playerId):
         self.playerIds.append(playerId)
 
+    def enoughPlayersToStart(self):
+        return len(self.playerIds) >= 3
+
     def __str__(self):
         return "GID: " + str(self.gid) + ", Solution: " + str(self.solution)
 

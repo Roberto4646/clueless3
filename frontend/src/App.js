@@ -14,6 +14,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [pid, setPID] = useState(-1);
   const [gid, setGID] = useState(-1);
+  const [gameStatus, setGameStatus] = useState('LOBBY')
   const [notifBanner, setNotifBanner] = useState("");
   const [gidInput, setGIDInput] = useState("");
   const [lobbyList, setLobbyList] = useState([]);
@@ -36,7 +37,12 @@ function App() {
   useEffect(() => {
     if (socket != null) {
       socket.on('NOTIFICATION', function (data) {
+        console.log(data[0])
         setNotifBanner(data[0]);
+
+        if (data[0] == 'GAME STARTED') {
+          setGameStatus('IN PROGRESS');
+        }
       });
 
       socket.on('LOBBY_CODE', function (data) {
@@ -309,18 +315,21 @@ function App() {
               onJoinLobby={joinLobby}
               gidInput={gidInput}
               setGIDInput={setGIDInput} 
+              gameStatus={gameStatus}
               />} />
           <Route path="/game-lobby" element={<GameLobbyPage 
             onStartGame={startGame}
             pid={pid} 
             gid={gid}
             renderLobbyList={renderLobbyList}
+            gameStatus={gameStatus}
           />} />
           <Route path="/join-lobby" element={<JoinLobbyPage 
             pid={pid} 
             gid={gid}
             charName={charName}
             renderLobbyList={renderLobbyList}
+            gameStatus={gameStatus}
           />} />
           <Route path="/main-game" element={<MainGamePage
               startGame={startGame}

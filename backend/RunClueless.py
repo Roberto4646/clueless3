@@ -97,7 +97,13 @@ def handle_game_start(gid):
             
     # get Game from list
     game = game_id_game[gid]
+
+    if not game.enoughPlayersToStart():
+        emit("NOTIFICATION", ["This lobby does not have enough players! (3-6 players)"])
+        return
+
     game.setupGame()
+    emit("NOTIFICATION", ["GAME STARTED"], to=gid)
 
     # tell each player their character and hand
     for pid in game.getPlayerIds():
