@@ -240,15 +240,12 @@ button[disabled]{
   display: table-row;
   overflow: hidden;
   height: 14.2857142857%;
-  /* width: 100% */
 }
 
 .map-component {
   display: table-cell;
-  /* border-color: #000000;
-  border:solid; */
   overflow: hidden;
-  font-size: small;
+  font-size: .75em;
   vertical-align: middle;
   text-align: center;
 }
@@ -291,4 +288,19 @@ button[disabled]{
   margin: auto;
   border-radius: 10px;
   outline: 2px solid #090b31;
+  display: 'flex';
+}
+
+.piece-container {
+  position: relative;
+  height: fit-content;
+  /* text-align: -webkit-center; */
+}
+
+.piece-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  position: relative;
+  margin: 5px;
 }

@@ -13,6 +13,20 @@ import NotificationChatbox from './components/NotificationChatbox';
 
 import clueless_logo from './clueless_logo.png';
 
+const dummyBoard = [
+  ['Mrs. Peacock', 'Billiard Room'],
+  ['Professor Plum', 'Professor Plum Start'],
+  ['Miss Scarlet', 'Miss Scarlet Start'],
+  ['Colonel Mustard', 'Colonel Mustard Start'],
+  ['Mr. Green', 'Mr. Green Start'],
+  ['Mrs. White', 'Mrs. White Start'],
+  ['Rope', 'Hall'],
+  ['Lead Pipe', 'Kitchen'],
+  ['Knife', 'Ballroom'],
+  ['Wrench', 'Conservatory'],
+  ['Candlestick', 'Library'],
+  ['Revolver', 'Billiard Room']
+]
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -28,6 +42,7 @@ function App() {
   const [turnOrder, setTurnOrder] = useState([]);
   const [turnCurr, setTurnCurr] = useState("");
   const [board, setBoard] = useState([]);
+  // const [board, setBoard] = useState(dummyBoard);
   const [suggestion, setSuggestion] = useState([]); // just temp for skeletal
   const [moveChoices, setMoveChoices] = useState([]); // just temp for skeletal
 
