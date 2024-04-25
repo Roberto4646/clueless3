@@ -4,18 +4,23 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import NotificationChatbox from './NotificationChatbox';
 
-function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput }) {
+function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput, gameStatus }) {
   const navigate = useNavigate();
 
   const handleCreateLobby = () => {
     onCreateLobby();
-    navigate('/game-lobby'); // Navigate to GameLobbyPage after creating lobby
   }
 
   const handleJoinLobby = () => {
     onJoinLobby();
-    navigate('/game-lobby'); // Navigate to GameLobbyPage after creating lobby
   }
+
+  React.useEffect(() => {
+    if (gameStatus == "IN LOBBY"){
+      navigate('/game-lobby');
+    } 
+  }, [gameStatus]);
+
     return (
 
       <div>

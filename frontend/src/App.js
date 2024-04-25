@@ -3,12 +3,12 @@ import io from 'socket.io-client';
 import React from 'react';
 import { useState, useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 import GameLobbyPage from './components/GameLobbyPage';
 import CreateLobbyPage from './components/CreateLobbyPage';
 import MainGamePage from './components/MainGamePage';
-import JoinLobbyPage from './components/JoinLobbyPage';
 import NotificationChatbox from './components/NotificationChatbox';
 
 import clueless_logo from './clueless_logo.png';
@@ -18,7 +18,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [pid, setPID] = useState(-1);
   const [gid, setGID] = useState(-1);
-  const [gameStatus, setGameStatus] = useState('LOBBY')
+  const [gameStatus, setGameStatus] = useState('NONE');  // controls what screen you're on
   const [notifBanner, setNotifBanner] = useState("");
   const [gidInput, setGIDInput] = useState("");
   const [lobbyList, setLobbyList] = useState([]);
@@ -56,10 +56,6 @@ function App() {
         setNotifBanner(data[0]);
 
         addToChatLog(data[0]);
-
-        if (data[0] == 'GAME STARTED') {
-          setGameStatus('IN PROGRESS');
-        }
       });
 
       socket.on('LOBBY_CODE', function (data) {
@@ -69,6 +65,11 @@ function App() {
 
       socket.on('LOBBY_STATUS', function (data) {
         setLobbyList(data);
+      });
+
+      socket.on('GAME_STATUS', function (data) {
+        console.log(data[0])
+        setGameStatus(data[0]);
       });
 
       socket.on('PLAYER_WHOAMI', function (data) {
@@ -190,6 +191,10 @@ function App() {
     }
     return output;
     // {output}
+  }
+
+  const renderMainMenuButton = () => {
+    return (<div className='button-custom' onClick={setGameStatus('NONE')}><Link className='link' to="/">Main Menu</Link></div>);
   }
 
   const renderLobbyList = () => {
@@ -339,14 +344,8 @@ function App() {
               gid={gid}
               renderLobbyList={renderLobbyList}
               gameStatus={gameStatus}
+              renderMainMenuButton={renderMainMenuButton}
             />} />
-            {/* <Route path="/join-lobby" element={<JoinLobbyPage 
-            pid={pid} 
-            gid={gid}
-            charName={charName}
-            renderLobbyList={renderLobbyList}
-            gameStatus={gameStatus}
-          />} /> */}
             <Route path="/main-game" element={<MainGamePage
               startGame={startGame}
               renderAccusation={renderAccusation}

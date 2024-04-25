@@ -58,7 +58,8 @@ def handle_create_game():
     # send the client their id and the lobby code for others to join
     emit("LOBBY_CODE", [pid, gid])
     emit("LOBBY_STATUS", game_id_game[gid].getPlayerIds(), to=gid)
-    emit("NOTIFICATION", ["You created a Clue-less game lobby."])
+    emit("NOTIFICATION", ["You created a Clue-less game lobby."], to=pid)
+    emit("GAME_STATUS", ["IN LOBBY"], to=pid)
     printState()
 
 @socketio.on('LOBBY_JOIN')
@@ -82,6 +83,7 @@ def handle_lobby_join(gid):
     emit("LOBBY_CODE", [pid, gid])
     emit("LOBBY_STATUS", game_id_game[gid].getPlayerIds(), to=gid)
     emit("NOTIFICATION", ["User " + str(pid) + " has joined the lobby."], to=gid)
+    emit("GAME_STATUS", ["IN LOBBY"], to=pid)
     printState()
     
 @socketio.on('GAME_START')
@@ -103,7 +105,7 @@ def handle_game_start(gid):
         return
 
     game.setupGame()
-    emit("NOTIFICATION", ["GAME STARTED"], to=gid)
+    emit("GAME_STATUS", ["GAME STARTED"], to=gid)
 
     # tell each player their character and hand
     for pid in game.getPlayerIds():
