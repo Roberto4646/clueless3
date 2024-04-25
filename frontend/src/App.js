@@ -37,8 +37,6 @@ function App() {
   const addToChatLog = (notif) => {
     setChatLog((prevChatLog) => {
       const new_entry = { timestamp: new Date().toLocaleTimeString(), message: notif };
-      console.log("adding " + new_entry.message);
-      console.log("orig len " + prevChatLog.length);
       return [...prevChatLog, new_entry];
     });
   };
@@ -52,9 +50,7 @@ function App() {
   useEffect(() => {
     if (socket != null) {
       socket.on('NOTIFICATION', function (data) {
-        console.log(data[0])
         setNotifBanner(data[0]);
-
         addToChatLog(data[0]);
       });
 
@@ -68,7 +64,6 @@ function App() {
       });
 
       socket.on('GAME_STATUS', function (data) {
-        console.log(data[0])
         setGameStatus(data[0]);
       });
 
@@ -358,6 +353,7 @@ function App() {
               renderLobbyList={renderLobbyList}
               turnCurr={turnCurr}
               renderBoard={renderBoard}
+              board={board}
               renderSuggestion={renderSuggestion}
               renderDisprove={renderDisprove}
               charName={charName}

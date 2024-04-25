@@ -1,17 +1,17 @@
 import React from 'react';
 import '../App.css';
+import Map from './MapComponent';
 
 function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, endTurn, 
-  renderHand, notifBanner, renderLobbyList, turnCurr, renderBoard, renderSuggestion, renderDisprove, charName, actions}) {
+  renderHand, notifBanner, renderLobbyList, turnCurr, renderBoard, board, renderSuggestion, renderDisprove, charName, actions}) {
     let isMyTurn = turnCurr === charName;
     let canMove = actions[0]
 
     return (
-      <div className="App">
-        <div className="button-column">
-          <div style={{ marginRight: "auto", marginBottom: "15px",  marginTop: "15px" }}> <strong>Current Notification : </strong> {notifBanner} </div>
-          <div style={{ marginRight: "auto" }}> <strong>Board: </strong> <pre>{renderBoard()}</pre> </div>
+      <div>
+          <Map board={board}/>
 
+          <div style={{ marginRight: "auto" }}> <strong>Board: </strong> <pre>{renderBoard()}</pre> </div>
           <div style={{ marginRight: "auto", marginBottom: "15px"}}>
             <strong>Player Hand:</strong>
             <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -33,7 +33,6 @@ function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, e
           {renderAccusation()}
           <div><button className="button-modern" onClick={endTurn} disabled={!isMyTurn}>End Turn</button></div>
 
-        </div>
       </div>
     );
   }

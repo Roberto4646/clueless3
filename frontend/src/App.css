@@ -223,3 +223,72 @@ button[disabled]{
   vertical-align: -webkit-baseline-middle;
   text-decoration: none;
 }
+
+.map-component-container {
+  width: 10%;
+  position: relative;
+}
+
+.map {
+  width: 60vh;
+  height: 60vh;
+  display: table;
+  table-layout: fixed;
+}
+
+.map-row {
+  display: table-row;
+  overflow: hidden;
+  height: 14.2857142857%;
+  /* width: 100% */
+}
+
+.map-component {
+  display: table-cell;
+  /* border-color: #000000;
+  border:solid; */
+  overflow: hidden;
+  font-size: small;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.map-room {
+  background-color: #153C0F;
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  text-align: center;
+  color: #FFF;
+  border-style: solid;
+  border-color: #000000;
+  box-sizing: border-box;
+  border-width: thin;
+}
+
+.map-hallway-horizontal {
+  background-color: #382F4D;
+  height: 3vh;
+  text-align: center;
+  color: #FFF;
+  margin: 20px 0;
+}
+.map-hallway-vertical {
+  background-color: #382F4D;
+  height: 100%;
+  text-align: center;
+  color: #FFF;
+  margin: 0 20px;
+}
+
+.map-start {
+  background-color: #0F213C;
+  text-align: center;
+  color: #FFF;
+  height: 80%;
+  width: 80%;
+  text-align: center;
+  margin: auto;
+  border-radius: 10px;
+  outline: 2px solid #090b31;
+}
