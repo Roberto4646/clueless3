@@ -46,7 +46,7 @@ function App() {
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
-  }, [chatLog]);
+  }, []);
 
   // Set up listeners
   useEffect(() => {
