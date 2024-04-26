@@ -111,6 +111,7 @@ def handle_game_start(gid):
     for pid in game.getPlayerIds():
         emit("PLAYER_WHOAMI", [game.getCharacterForPlayer(pid)], to=pid)
         emit("PLAYER_HAND", game.getHandForPlayer(pid), to=pid)
+        emit("NOTIFICATION", "You are " + game.getCharacterForPlayer(pid) + ". The game has started.", to=pid)
     
     # send game board, turn order, and current turn to all players
     currentPlayer, currentCharacter = game.getCurrentTurn()
@@ -157,7 +158,7 @@ def handle_turn_action(data):
             if success:
                 emit("MOVE_CHOICES", [])
                 emit("PLAYER_ACTIONS", game.getTurnActions(pid))
-                emit("NOTIFICATION", ["User " + str(pid) + " has moved to "+params[0]+"."], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has moved to "+params[0]+"."], to=gid)
                 emit("GAME_BOARD", game.getBoard(), to=gid)
             else:
                 emit("NOTIFICATION", ["Invalid location choice."])

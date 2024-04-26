@@ -2,16 +2,28 @@ import React from 'react';
 import '../App.css';
 import Map from './MapComponent';
 
+
+const renderTurnOrder = (turnOrder, turnCurr) => {
+  if (!turnOrder) return;
+  return turnOrder.map((player) => {
+    return <div style={{display:'flex'}}>
+          <div className='piece-circle' style={{backgroundColor: (turnCurr == player) ? 'white' : 'transparent'}}/>
+          <div>{player}</div>
+      </div>
+  } )
+};
+
 function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, endTurn, 
-  renderHand, notifBanner, renderLobbyList, turnCurr, renderBoard, board, renderSuggestion, renderDisprove, charName, actions}) {
+  renderHand, notifBanner, renderLobbyList, turnCurr, renderBoard, board, renderSuggestion, renderDisprove, charName, actions, turnOrder}) {
     let isMyTurn = turnCurr === charName;
     let canMove = actions[0]
+
+    
 
     return (
       <div>
           <Map board={board}/>
 
-          <div style={{ marginRight: "auto" }}> <strong>Board: </strong> <pre>{renderBoard()}</pre> </div>
           <div style={{ marginRight: "auto", marginBottom: "15px"}}>
             <strong>Player Hand:</strong>
             <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -22,8 +34,11 @@ function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, e
               ))}
             </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", marginBottom: "15px" }}> <strong>Character Name: </strong> {charName}  </div>
-          <div style={{ display: "flex", flexDirection: "column", marginBottom: "15px" }}> <strong>Current Turn: </strong> {turnCurr} </div>
+
+          <div style={{ display: "flex", flexDirection: "column", marginBottom: "15px" }}> <strong>You are: </strong> {charName}  </div>
+          
+          <strong>Turn order:</strong> {renderTurnOrder(turnOrder, turnCurr)}
+          
           {renderDisprove()}
           <div>
             <button style={{ marginRight: "15px" }} className="button-modern" onClick={move} disabled={!isMyTurn || !canMove}>Move</button>

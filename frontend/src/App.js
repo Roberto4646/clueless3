@@ -28,6 +28,8 @@ const dummyBoard = [
   ['Revolver', 'Billiard Room']
 ]
 
+const dummyTurnOrder = ['Miss Scarlet', 'Mrs. Peacock', 'Colonel Mustard', 'Mr. Green', ,'Mrs. White', 'Professor Plum']
+
 function App() {
   const [socket, setSocket] = useState(null);
   const [pid, setPID] = useState(-1);
@@ -40,6 +42,7 @@ function App() {
   const [actions, setActions] = useState([]);
   const [hand, setHand] = useState([]);
   const [turnOrder, setTurnOrder] = useState([]);
+  // const [turnOrder, setTurnOrder] = useState(dummyTurnOrder);
   const [turnCurr, setTurnCurr] = useState("");
   const [board, setBoard] = useState([]);
   // const [board, setBoard] = useState(dummyBoard);
@@ -95,7 +98,7 @@ function App() {
       });
 
       socket.on('TURN_ORDER', function (data) {
-        setTurnOrder(data);
+        setTurnOrder(data[0]);
       });
 
       socket.on('TURN_CURRENT', function (data) {
@@ -373,6 +376,7 @@ function App() {
               renderDisprove={renderDisprove}
               charName={charName}
               actions={actions}
+              turnOrder={turnOrder}
             />} />
           </Routes>
         </Router>
