@@ -111,7 +111,7 @@ def handle_game_start(gid):
     for pid in game.getPlayerIds():
         emit("PLAYER_WHOAMI", [game.getCharacterForPlayer(pid)], to=pid)
         emit("PLAYER_HAND", game.getHandForPlayer(pid), to=pid)
-        emit("NOTIFICATION", "You are " + game.getCharacterForPlayer(pid) + ". The game has started.", to=pid)
+        emit("NOTIFICATION", ["You are " + game.getCharacterForPlayer(pid) + ". The game has started."], to=pid)
     
     # send game board, turn order, and current turn to all players
     currentPlayer, currentCharacter = game.getCurrentTurn()
