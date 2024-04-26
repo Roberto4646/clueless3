@@ -3,12 +3,12 @@ import '../App.css';
 import Map from './MapComponent';
 
 
-const renderTurnOrder = (turnOrder, turnCurr) => {
+const renderTurnOrder = (turnOrder, turnCurr, charName) => {
   if (!turnOrder) return;
   return turnOrder.map((player) => {
     return <div style={{display:'flex'}}>
           <div className='piece-circle' style={{backgroundColor: (turnCurr == player) ? 'white' : 'transparent'}}/>
-          <div>{player}</div>
+          <div>{player} {charName == player ? " (You)" : ""}</div>
       </div>
   } )
 };
@@ -34,11 +34,9 @@ function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, e
               ))}
             </div>
           </div>
+          
+          <strong>Turn order:</strong> {renderTurnOrder(turnOrder, turnCurr, charName)}
 
-          <div style={{ display: "flex", flexDirection: "column", marginBottom: "15px" }}> <strong>You are: </strong> {charName}  </div>
-          
-          <strong>Turn order:</strong> {renderTurnOrder(turnOrder, turnCurr)}
-          
           {renderDisprove()}
           <div>
             <button style={{ marginRight: "15px" }} className="button-modern" onClick={move} disabled={!isMyTurn || !canMove}>Move</button>
