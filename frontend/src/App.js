@@ -48,6 +48,7 @@ function App() {
   // const [board, setBoard] = useState(dummyBoard);
   const [suggestion, setSuggestion] = useState([]); // just temp for skeletal
   const [moveChoices, setMoveChoices] = useState([]); // just temp for skeletal
+  const [playerName, setPlayerName] = useState("")
 
   const initial_chatLog = {timestamp: (new Date()).toLocaleTimeString(), message: "This is where game notifications appear"};
   let [chatLog, setChatLog] = useState([]);
@@ -121,11 +122,11 @@ function App() {
 
   // Client Actions ------------------------------------------------
   const createLobby = () => {
-    socket.emit('LOBBY_CREATE');
+    socket.emit('LOBBY_CREATE', playerName);
   }
 
   const joinLobby = () => {
-    socket.emit('LOBBY_JOIN', gidInput);
+    socket.emit('LOBBY_JOIN', [gidInput, playerName]);
     setGIDInput("");
   }
 
@@ -349,11 +350,14 @@ function App() {
               onJoinLobby={joinLobby}
               gidInput={gidInput}
               setGIDInput={setGIDInput}
+              playerName={playerName}
+              setPlayerName={setPlayerName}
               gameStatus={gameStatus}
             />} />
             <Route path="/game-lobby" element={<GameLobbyPage
               onStartGame={startGame}
               pid={pid}
+              playerName={playerName}
               gid={gid}
               renderLobbyList={renderLobbyList}
               gameStatus={gameStatus}

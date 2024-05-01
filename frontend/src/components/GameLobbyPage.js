@@ -3,7 +3,7 @@ import '../App.css';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
-function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList, renderMainMenuButton, gameStatus}) {
+function GameLobbyPage({ onStartGame, pid, playerName, gid, renderLobbyList, renderMainMenuButton, gameStatus}) {
   const navigate = useNavigate();
 
   const handleStartGame = () => {
@@ -20,7 +20,7 @@ function GameLobbyPage({ onStartGame, pid, gid, renderLobbyList, renderMainMenuB
   return (
     <div style={{ textAlign: "-webkit-center" }}>
       {pid !== -1 && <div>Lobby Code: {gid}</div>}
-      {pid !== -1 && <div>Player ID: {pid}</div>}
+      {pid !== -1 && <div>Player ID: {pid} ({playerName})</div>}
       <br />
       <div> Lobby Members: {renderLobbyList()}</div>
       <br />

@@ -15,6 +15,7 @@ game_ids = [] # list of lobby codes
 player_ids = [] # UID for each player
 game_id_game = {} # map each game_id to a Game object
 players_in_game = {} 
+player_name = {} #Map PID to names
 
 # Testing
 #-----------------------------------------------------------------------
@@ -33,10 +34,11 @@ def printState():
 #-----------------------------------------------------------------------
         
 @socketio.on('LOBBY_CREATE')
-def handle_create_game():
+def handle_create_game(name):
     # give the player an ID
     pid = request.sid
     player_ids.append(pid)
+    player_name[pid] = name
 
     # make a Game and game ID
     gid = 0
@@ -63,8 +65,10 @@ def handle_create_game():
     printState()
 
 @socketio.on('LOBBY_JOIN')
-def handle_lobby_join(gid):
-    gid=int(gid)
+def handle_lobby_join(data):
+    #data contains gidInput and playerName
+    print(data)
+    gid=int(data[0])
 
     # validate GID
     if gid not in game_ids:
@@ -74,6 +78,7 @@ def handle_lobby_join(gid):
     # assign PID 
     pid = request.sid
     player_ids.append(pid)
+    player_name[pid] = data[1]
     
     # associate PID to the game
     players_in_game[pid] = gid
@@ -82,9 +87,10 @@ def handle_lobby_join(gid):
 
     emit("LOBBY_CODE", [pid, gid])
     emit("LOBBY_STATUS", game_id_game[gid].getPlayerIds(), to=gid)
-    emit("NOTIFICATION", ["User " + str(pid) + " has joined the lobby."], to=gid)
+    emit("NOTIFICATION", ["User " + str(pid) + " (" + player_name[pid] + ") has joined the lobby."], to=gid)
     emit("GAME_STATUS", ["IN LOBBY"], to=pid)
     printState()
+
     
 @socketio.on('GAME_START')
 def handle_game_start(gid):    
@@ -146,7 +152,7 @@ def handle_turn_action(data):
         nextPlayerId = game.endTurn(pid)
         emit("PLAYER_ACTIONS", game.getTurnActions(pid), to=pid)
         emit("MOVE_CHOICES", [])
-        emit("NOTIFICATION", ["User " + str(pid) + " has ended their turn and User " + str(nextPlayerId) + " is up next."], to=gid)        
+        emit("NOTIFICATION", ["User " + str(pid) + " (" + player_name[pid] + ") has ended their turn and User " + str(nextPlayerId) + " (" + player_name[nextPlayerId] + ") is up next."], to=gid)        
         currentPlayer, currentCharacter = game.getCurrentTurn()
         emit("TURN_CURRENT", [currentCharacter], to=gid)
         emit("PLAYER_ACTIONS", game.getTurnActions(nextPlayerId), to=nextPlayerId)
@@ -158,7 +164,7 @@ def handle_turn_action(data):
             if success:
                 emit("MOVE_CHOICES", [])
                 emit("PLAYER_ACTIONS", game.getTurnActions(pid))
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has moved to "+params[0]+"."], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") has moved to "+params[0]+"."], to=gid)
                 emit("GAME_BOARD", game.getBoard(), to=gid)
             else:
                 emit("NOTIFICATION", ["Invalid location choice."])
@@ -167,10 +173,10 @@ def handle_turn_action(data):
         if len(params) == 1:    # player is disproving, params = ["<The proof>"]
             success, nextPidToDisprove, suggester, suggestion = game.disproveSuggestion(pid, params[0])
             if success:
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has disproved the suggestion!"], to=gid)
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") has disproved the suggestion!"], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
             elif nextPidToDisprove != suggester:
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " could not disprove the suggestion! " + game.getCharacterForPlayer(nextPidToDisprove) + " is next!"], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") could not disprove the suggestion! " + game.getCharacterForPlayer(nextPidToDisprove) + " (" + player_name[pid] + ") is next!"], to=gid)
                 emit("REQUEST_PROOF", list(suggestion), to=nextPidToDisprove)
             else:
                 emit("NOTIFICATION", ["No one could disprove the suggestion!"], to=gid)
@@ -185,13 +191,13 @@ def handle_turn_action(data):
                 nextPidToDisprove = game.processSuggestion(pid, suspect, room, weapon)
 
                 emit("PLAYER_ACTIONS", game.getTurnActions(pid))
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " suggests "
-                                      + suspect +" committed the crime in the "+ room +" with the "+ weapon + 
-                                      ". " + suspect + " has been moved to " + room], to=gid)
+                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") suggests "
+                                      + suspect + " (" + player_name[game.getPidByName(suspect)] + ") committed the crime in the "+ room +" with the "+ weapon + 
+                                      ". " + suspect + " (" + player_name[game.getPidByName(suspect)] + ") has been moved to " + room], to=gid)
                 emit("GAME_BOARD", game.getBoard(), to=gid) 
 
                 emit("REQUEST_PROOF", [suspect, weapon, room], to=nextPidToDisprove)
-                print(game.getCharacterForPlayer(nextPidToDisprove) + "'s turn to disprove") #DELETE
+                print(game.getCharacterForPlayer(nextPidToDisprove) + " (" + player_name[pid] + ")'s turn to disprove") #DELETE
 
             # else, do failed suggestion stuff
             else: 
@@ -207,10 +213,10 @@ def handle_turn_action(data):
         emit("PLAYER_ACTIONS", game.getTurnActions(pid), to=pid)
 
         if success:
-            emit("NOTIFICATION", ["User " + str(pid) + " has solved the mystery! The solution is "+str(game.solution)+"."], to=gid)
+            emit("NOTIFICATION", ["User " + str(pid) + " (" + player_name[pid] + ") has solved the mystery! The solution is "+str(game.solution)+"."], to=gid)
             emit("PLAYER_ACTIONS", [game.getTurnActions(pid)], to=gid)
         else:
-            emit("NOTIFICATION", ["User " + str(pid) + " made a wrong accusation!"], to=gid)
+            emit("NOTIFICATION", ["User " + str(pid) + " (" + player_name[pid] + ") made a wrong accusation!"], to=gid)
             emit("NOTIFICATION", ["You accused incorrectly! The solution is "+str(game.solution)+"."])
 
         return

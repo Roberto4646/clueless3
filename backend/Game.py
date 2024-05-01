@@ -132,6 +132,13 @@ class Game:
 
     def getHandForPlayer(self, playerId):
         return self.playerToCharacter[playerId].getHandCards()
+    
+    def getPidByName(self, name):
+        for key, value in self.playerToCharacter.items():
+            print("we are comparing to" + str(value.getName()) + str(name))
+            if value.getName() == name:
+                return key
+        return None
 
     def getBoard(self):
         # accumulate all character and weapon positions
