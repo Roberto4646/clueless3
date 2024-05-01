@@ -67,7 +67,6 @@ def handle_create_game(name):
 @socketio.on('LOBBY_JOIN')
 def handle_lobby_join(data):
     #data contains gidInput and playerName
-    print(data)
     gid=int(data[0])
 
     # validate GID
@@ -222,7 +221,14 @@ def handle_turn_action(data):
         return
     
     
-         
+@socketio.on('CHAT_MESSAGE')
+def handle_chat_message(message):
+    pid = request.sid
+    if pid not in players_in_game.keys():
+        return
+    gid = players_in_game[pid]
+    emit("NOTIFICATION", [player_name[pid] + ": " + message], to=gid)
+    
     
     
     

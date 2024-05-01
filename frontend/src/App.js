@@ -183,6 +183,10 @@ function App() {
     setSuggestion([]);
   }
 
+  const sendChat = (message) => {
+    socket.emit("CHAT_MESSAGE", message)
+  }
+
   // HTML Rendering --------------------------------------------------
   const renderActions = () => {
     return actions.join();
@@ -386,7 +390,8 @@ function App() {
         </Router>
       </div>
       <div className='chatbox'>
-        <NotificationChatbox notifications={chatLog} />
+        <NotificationChatbox notifications={chatLog}
+          sendChat = {sendChat}/>
 
       </div>
     </div>

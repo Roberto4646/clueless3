@@ -34,7 +34,7 @@ function CreateLobbyPage({ onCreateLobby, onJoinLobby, gidInput, setGIDInput, pl
         </div>
         <div style={{color: "#fff"}}>
           <label for="nameBox">Enter your name:</label>
-          <input type="text" className="text-entry" name="nameBox" value={playerName} onChange={e => setPlayerName(e.target.value)} required/>
+          <input type="text" className="text-entry" name="nameBox" value={playerName} onChange={e => setPlayerName(e.target.value)}/>
         </div>
       </div>
 
