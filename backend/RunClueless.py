@@ -174,11 +174,13 @@ def handle_turn_action(data):
             if success:
                 emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") has disproved the suggestion!"], to=gid)
                 emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") has disproved the suggestion with a "+params[0]+" card!"], to=suggester)
+                emit("PLAYER_ACTIONS", game.getTurnActions(suggester), to=suggester)
             elif nextPidToDisprove != suggester:
                 emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") could not disprove the suggestion! " + game.getCharacterForPlayer(nextPidToDisprove) + " (" + player_name[pid] + ") is next!"], to=gid)
                 emit("REQUEST_PROOF", list(suggestion), to=nextPidToDisprove)
             else:
                 emit("NOTIFICATION", ["No one could disprove the suggestion!"], to=gid)
+                emit("PLAYER_ACTIONS", game.getTurnActions(suggester), to=suggester)
         elif len(params) == 2:                   # player is making a suggestion, params = ["Suspect", "Weapon"]. Room = current room
             # suggestion is valid in game (positions, etc)
             suspect, weapon = params
@@ -189,10 +191,16 @@ def handle_turn_action(data):
 
                 nextPidToDisprove = game.processSuggestion(pid, suspect, room, weapon)
 
-                emit("PLAYER_ACTIONS", game.getTurnActions(pid))
-                emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") suggests "
+                if (not game.getPidByName(suspect) == None):
+                    emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") suggests "
                                       + suspect + " (" + player_name[game.getPidByName(suspect)] + ") committed the crime in the "+ room +" with the "+ weapon + 
                                       ". " + suspect + " (" + player_name[game.getPidByName(suspect)] + ") has been moved to " + room], to=gid)
+                else:
+                    emit("NOTIFICATION", [game.getCharacterForPlayer(pid) + " (" + player_name[pid] + ") suggests "
+                                      + suspect + " committed the crime in the "+ room +" with the "+ weapon + 
+                                      ". " + suspect + " has been moved to " + room], to=gid)
+                    
+                emit("PLAYER_ACTIONS", [False, False, False])
                 emit("GAME_BOARD", game.getBoard(), to=gid) 
 
                 emit("REQUEST_PROOF", [suspect, weapon, room], to=nextPidToDisprove)

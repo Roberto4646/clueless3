@@ -174,7 +174,7 @@ class Game:
                 canMove = True
 
             # if player has not made a suggestion this turn
-            canSuggest = not character.hasSuggested
+            canSuggest = (not character.hasSuggested) and self.board.isRoom(character.getLocation())
 
             # if player has not made an accusation this game
             canAccuse = not character.hasAccused
