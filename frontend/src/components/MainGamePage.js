@@ -21,7 +21,7 @@ function MainGamePage({ renderAccusation, move, moveChoices, renderMoveChoice, e
     
 
     return (
-      <div>
+      <div style={{ marginLeft: "10px"}}>
           <Map board={board}/>
 
           <div style={{ marginRight: "auto", marginBottom: "15px"}}>

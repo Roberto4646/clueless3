@@ -73,7 +73,7 @@ function putPiecesOnComponent(name, board) {
 
 function Map({board}) {
     return (
-        <div className='map'>
+        <div className='map' style={{marginLeft: "25%"}}>
            
             {
                 containers.map((row) => {
