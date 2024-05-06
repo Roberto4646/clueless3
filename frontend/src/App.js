@@ -28,6 +28,8 @@ const dummyBoard = [
   ['Revolver', 'Billiard Room']
 ]
 
+const dummyHand = ["Miss Scarlet", "Colonel Mustard", "Mrs. White", "Mr. Green", "Mrs. Peacock", "Professor Plum", "Rope",  "Lead Pipe", "Knife", "Wrench", "Candlestick", "Revolver", "Hall", "Lounge", "Library", "Billiard Room", "Dining Room", "Conservatory", "Ballroom", "Kitchen"]
+
 const dummyTurnOrder = ['Miss Scarlet', 'Mrs. Peacock', 'Colonel Mustard', 'Mr. Green', ,'Mrs. White', 'Professor Plum']
 
 function App() {
@@ -41,6 +43,8 @@ function App() {
   const [charName, setCharName] = useState("");
   const [actions, setActions] = useState([]);
   const [hand, setHand] = useState([]);
+  // const [hand, setHand] = useState(dummyHand);
+
   const [turnOrder, setTurnOrder] = useState([]);
   // const [turnOrder, setTurnOrder] = useState(dummyTurnOrder);
   const [turnCurr, setTurnCurr] = useState("");
@@ -190,10 +194,6 @@ function App() {
   // HTML Rendering --------------------------------------------------
   const renderActions = () => {
     return actions.join();
-  }
-
-  const renderHand = () => {
-    return hand.join();
   }
   
   const renderTurnOrder = () => {
@@ -374,7 +374,6 @@ function App() {
               moveChoices={moveChoices}
               renderMoveChoice={renderMoveChoice}
               endTurn={endTurn}
-              renderHand={renderHand}
               notifBanner={notifBanner}
               renderLobbyList={renderLobbyList}
               turnCurr={turnCurr}
@@ -385,6 +384,7 @@ function App() {
               charName={charName}
               actions={actions}
               turnOrder={turnOrder}
+              hand={hand}
             />} />
           </Routes>
         </Router>

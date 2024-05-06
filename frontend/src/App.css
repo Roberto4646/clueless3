@@ -304,3 +304,15 @@ button[disabled]{
   position: relative;
   margin: 5px;
 }
+
+.card {
+  /* width: 10vw; */
+  height: 20vh;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.hand-container {
+  align-items: center;
+  vertical-align: middle;
+}
